@@ -18,22 +18,23 @@ var (
 )
 
 type Bico struct {
-	ID    int64
-	Nome  string
-	Ativo bool
+	ID      int64 `gorm:"primaryKey"`
+	BombaID int64 `gorm:"not null;index"`
+	Nome    string `gorm:"size:100;not null"`
+	Ativo   bool `gorm:"not null;default:true"`
 }
 
 type Bomba struct {
-	ID             int64
-	EmpresaID      int64
-	LocalID        int64
-	Movel          bool
-	Nome           string
-	Descricao      string
-	ReservatorioID int64
-	Bicos          []Bico
-	Ativo          bool
-	Audit          shared.AuditFields
+	ID             int64 `gorm:"primaryKey"`
+	EmpresaID      int64 `gorm:"not null;index"`
+	LocalID        int64 `gorm:"index"`
+	Movel          bool `gorm:"not null;default:false"`
+	Nome           string `gorm:"size:255;not null"`
+	Descricao      string `gorm:"type:text"`
+	ReservatorioID int64 `gorm:"not null;index"`
+	Bicos          []Bico `gorm:"foreignKey:BombaID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Ativo          bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewBomba(empresaID, localID, reservatorioID int64, movel bool, nome, descricao string) (*Bomba, error) {

@@ -15,15 +15,15 @@ var (
 )
 
 type Preco struct {
-	ID             int64
-	EmpresaID      int64
-	CombustivelID  int64
-	PrecoCusto     float64
-	PrecoVenda     float64
-	VigenciaInicio time.Time
-	VigenciaFim    *time.Time
-	Ativo          bool
-	Audit          shared.AuditFields
+	ID             int64 `gorm:"primaryKey"`
+	EmpresaID      int64 `gorm:"not null;index"`
+	CombustivelID  int64 `gorm:"not null;index"`
+	PrecoCusto     float64 `gorm:"not null"`
+	PrecoVenda     float64 `gorm:"not null"`
+	VigenciaInicio time.Time `gorm:"not null"`
+	VigenciaFim    *time.Time `gorm:"index"`
+	Ativo          bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewPreco(empresaID, combustivelID int64, precoCusto, precoVenda float64, vigenciaInicio time.Time) (*Preco, error) {

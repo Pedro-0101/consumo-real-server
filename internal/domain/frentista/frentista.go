@@ -13,13 +13,13 @@ var (
 )
 
 type Frentista struct {
-	ID        int64
-	EmpresaID int64
-	UsuarioID int64
-	Nome      string
-	Matricula string
-	Ativo     bool
-	Audit     shared.AuditFields
+	ID        int64 `gorm:"primaryKey"`
+	EmpresaID int64 `gorm:"not null;index"`
+	UsuarioID int64 `gorm:"index"`
+	Nome      string `gorm:"size:255;not null"`
+	Matricula string `gorm:"size:50;index"`
+	Ativo     bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewFrentista(empresaID int64, nome, matricula string) (*Frentista, error) {

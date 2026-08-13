@@ -29,17 +29,17 @@ var (
 )
 
 type Patrimonio struct {
-	ID                      int64
-	EmpresaID               int64
-	UnidadeAdministrativaID int64
-	Nome                    string
-	Descricao               string
-	Tipo                    string
-	TipoMedicao             TipoMedicao
-	CodigoExterno           string
-	Atributos               map[string]string
-	Ativo                   bool
-	Audit                   shared.AuditFields
+	ID                      int64 `gorm:"primaryKey"`
+	EmpresaID               int64 `gorm:"not null;index"`
+	UnidadeAdministrativaID int64 `gorm:"index"`
+	Nome                    string `gorm:"size:255;not null"`
+	Descricao               string `gorm:"type:text"`
+	Tipo                    string `gorm:"type:varchar(30);not null;index"`
+	TipoMedicao             TipoMedicao `gorm:"type:varchar(20);not null"`
+	CodigoExterno           string `gorm:"size:100;index"`
+	Atributos               map[string]string `gorm:"type:jsonb;serializer:json"`
+	Ativo                   bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewPatrimonio(empresaID int64, nome, tipo, codigoExterno string, tipoMedicao TipoMedicao) (*Patrimonio, error) {

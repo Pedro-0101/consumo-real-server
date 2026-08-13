@@ -24,14 +24,14 @@ var (
 )
 
 type Usuario struct {
-	ID        int64
-	EmpresaID int64
-	Nome      string
-	Email     string
-	SenhaHash string
-	Papel     Papel
-	Ativo     bool
-	Audit     shared.AuditFields
+	ID        int64 `gorm:"primaryKey"`
+	EmpresaID int64 `gorm:"index"`
+	Nome      string `gorm:"size:255;not null"`
+	Email     string `gorm:"size:255;not null;uniqueIndex"`
+	SenhaHash string `gorm:"size:255;not null"`
+	Papel     Papel `gorm:"type:varchar(20);not null;index"`
+	Ativo     bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewUsuario(nome, email, senhaHash string, papel Papel, empresaID int64) (*Usuario, error) {

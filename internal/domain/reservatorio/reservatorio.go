@@ -23,15 +23,16 @@ var (
 )
 
 type Reservatorio struct {
-	ID          int64
-	EmpresaID   int64
-	Nome        string
-	Capacidade  float64
-	NivelAtual  float64
-	NivelMinimo float64
-	Combustivel combustivel.Combustivel
-	Ativo       bool
-	Audit       shared.AuditFields
+	ID            int64 `gorm:"primaryKey"`
+	EmpresaID     int64 `gorm:"not null;index"`
+	Nome          string `gorm:"size:255;not null"`
+	Capacidade    float64 `gorm:"not null"`
+	NivelAtual    float64 `gorm:"not null;default:0"`
+	NivelMinimo   float64 `gorm:"not null;default:0"`
+	CombustivelID int64 `gorm:"not null;index"`
+	Combustivel   combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Ativo         bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewReservatorio(empresaID int64, nome string, capacidade, nivelInicial, nivelMinimo float64, combustivel combustivel.Combustivel) (*Reservatorio, error) {
@@ -58,13 +59,14 @@ func NewReservatorio(empresaID int64, nome string, capacidade, nivelInicial, niv
 	}
 
 	return &Reservatorio{
-		EmpresaID:   empresaID,
-		Nome:        nome,
-		Capacidade:  capacidade,
-		NivelAtual:  nivelInicial,
-		NivelMinimo: nivelMinimo,
-		Combustivel: combustivel,
-		Ativo:       true,
+		EmpresaID:     empresaID,
+		Nome:          nome,
+		Capacidade:    capacidade,
+		NivelAtual:    nivelInicial,
+		NivelMinimo:   nivelMinimo,
+		CombustivelID: combustivel.ID,
+		Combustivel:   combustivel,
+		Ativo:         true,
 	}, nil
 }
 

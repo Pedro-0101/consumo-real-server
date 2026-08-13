@@ -28,16 +28,16 @@ var (
 )
 
 type OrdemAbastecimento struct {
-	ID                   int64
-	EmpresaID            int64
-	Numero               string
-	PatrimonioID         int64
-	QuantidadeAutorizada float64
-	QuantidadeAbastecida float64
-	Status               Status
-	DataEmissao          time.Time
-	DataValidade         *time.Time
-	Audit                shared.AuditFields
+	ID                   int64 `gorm:"primaryKey"`
+	EmpresaID            int64 `gorm:"not null;index"`
+	Numero               string `gorm:"size:50;not null;uniqueIndex"`
+	PatrimonioID         int64 `gorm:"not null;index"`
+	QuantidadeAutorizada float64 `gorm:"not null"`
+	QuantidadeAbastecida float64 `gorm:"not null;default:0"`
+	Status               Status `gorm:"type:varchar(20);not null;index"`
+	DataEmissao          time.Time `gorm:"not null"`
+	DataValidade         *time.Time `gorm:"index"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewOrdemAbastecimento(empresaID, patrimonioID int64, numero string, quantidadeAutorizada float64, dataValidade *time.Time) (*OrdemAbastecimento, error) {

@@ -13,12 +13,12 @@ var (
 )
 
 type Fornecedor struct {
-	ID        int64
-	EmpresaID int64
-	Nome      string
-	CNPJ      string
-	Ativo     bool
-	Audit     shared.AuditFields
+	ID        int64 `gorm:"primaryKey"`
+	EmpresaID int64 `gorm:"not null;index"`
+	Nome      string `gorm:"size:255;not null"`
+	CNPJ      string `gorm:"size:20;index"`
+	Ativo     bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewFornecedor(empresaID int64, nome, cnpj string) (*Fornecedor, error) {

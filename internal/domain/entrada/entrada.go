@@ -20,15 +20,16 @@ var (
 )
 
 type Entrada struct {
-	ID             int64
-	EmpresaID      int64
-	FornecedorID   int64
-	ReservatorioID int64
-	Combustivel    combustivel.Combustivel
-	Quantidade     float64
-	NotaFiscal     string
-	Data           time.Time
-	Audit          shared.AuditFields
+	ID             int64 `gorm:"primaryKey"`
+	EmpresaID      int64 `gorm:"not null;index"`
+	FornecedorID   int64 `gorm:"not null;index"`
+	ReservatorioID int64 `gorm:"not null;index"`
+	CombustivelID  int64 `gorm:"not null;index"`
+	Combustivel    combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Quantidade     float64 `gorm:"not null"`
+	NotaFiscal     string `gorm:"size:60;index"`
+	Data           time.Time `gorm:"not null;index"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewEntrada(empresaID, fornecedorID int64, reservatorio *reservatorio.Reservatorio, quantidade float64, notaFiscal string) (*Entrada, error) {
@@ -55,6 +56,7 @@ func NewEntrada(empresaID, fornecedorID int64, reservatorio *reservatorio.Reserv
 		EmpresaID:      empresaID,
 		FornecedorID:   fornecedorID,
 		ReservatorioID: reservatorio.ID,
+		CombustivelID:  reservatorio.Combustivel.ID,
 		Combustivel:    reservatorio.Combustivel,
 		Quantidade:     quantidade,
 		NotaFiscal:     strings.TrimSpace(notaFiscal),

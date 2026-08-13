@@ -13,11 +13,11 @@ var (
 )
 
 type Empresa struct {
-	ID    int64
-	Nome  string
-	CNPJ  string
-	Ativo bool
-	Audit shared.AuditFields
+	ID    int64 `gorm:"primaryKey"`
+	Nome  string `gorm:"size:255;not null"`
+	CNPJ  string `gorm:"size:20;not null;uniqueIndex"`
+	Ativo bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewEmpresa(nome, cnpj string) (*Empresa, error) {

@@ -14,13 +14,13 @@ var (
 )
 
 type Local struct {
-	ID                      int64
-	EmpresaID               int64
-	UnidadeAdministrativaID int64
-	Nome                    string
-	Descricao               string
-	Ativo                   bool
-	Audit                   shared.AuditFields
+	ID                      int64 `gorm:"primaryKey"`
+	EmpresaID               int64 `gorm:"not null;index"`
+	UnidadeAdministrativaID int64 `gorm:"not null;index"`
+	Nome                    string `gorm:"size:255;not null"`
+	Descricao               string `gorm:"type:text"`
+	Ativo                   bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewLocal(empresaID, unidadeAdministrativaID int64, nome, descricao string) (*Local, error) {

@@ -22,13 +22,13 @@ var (
 )
 
 type UnidadeAdministrativa struct {
-	ID                      int64
-	EmpresaID               int64
-	UnidadeAdministrativaID int64
-	Nome                    string
-	Tipo                    Tipo
-	Ativo                   bool
-	Audit                   shared.AuditFields
+	ID                      int64 `gorm:"primaryKey"`
+	EmpresaID               int64 `gorm:"not null;index"`
+	UnidadeAdministrativaID int64 `gorm:"index"`
+	Nome                    string `gorm:"size:255;not null"`
+	Tipo                    Tipo `gorm:"type:varchar(20);not null"`
+	Ativo                   bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewUnidadeAdministrativa(empresaID, unidadeAdministrativaID int64, nome string, tipo Tipo) (*UnidadeAdministrativa, error) {

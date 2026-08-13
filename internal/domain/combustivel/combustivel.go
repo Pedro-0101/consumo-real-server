@@ -31,16 +31,16 @@ var (
 )
 
 type Combustivel struct {
-	ID         int64
-	EmpresaID  int64
-	Nome       string
-	Tipo       Tipo
-	Unidade    Unidade
-	Densidade  float64
-	PrecoCusto float64
-	PrecoVenda float64
-	Ativo      bool
-	Audit      shared.AuditFields
+	ID         int64 `gorm:"primaryKey"`
+	EmpresaID  int64 `gorm:"not null;index"`
+	Nome       string `gorm:"size:255;not null"`
+	Tipo       Tipo `gorm:"type:varchar(30);not null"`
+	Unidade    Unidade `gorm:"type:varchar(20);not null"`
+	Densidade  float64 `gorm:"not null"`
+	PrecoCusto float64 `gorm:"not null;default:0"`
+	PrecoVenda float64 `gorm:"not null;default:0"`
+	Ativo      bool `gorm:"not null;default:true"`
+	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewCombustivel(empresaID int64, nome string, tipo Tipo, unidade Unidade, densidade, precoCusto, precoVenda float64) (*Combustivel, error) {
