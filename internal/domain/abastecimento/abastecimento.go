@@ -38,25 +38,25 @@ var (
 )
 
 type Abastecimento struct {
-	ID                    int64 `gorm:"primaryKey"`
-	EmpresaID             int64 `gorm:"not null;index"`
-	LocalID               int64 `gorm:"not null;index"`
-	BombaID               int64 `gorm:"not null;index"`
-	BicoID                int64 `gorm:"not null;index"`
-	Tipo                  Tipo `gorm:"type:varchar(20);not null;index"`
-	Data                  time.Time `gorm:"not null;index"`
-	Quantidade            float64 `gorm:"not null"`
-	PrecoUnitario         float64 `gorm:"not null;default:0"`
-	ValorTotal            float64 `gorm:"not null;default:0"`
-	Odometro              float64 `gorm:"default:0"`
-	Horimetro             float64 `gorm:"default:0"`
-	CombustivelID         int64 `gorm:"not null;index"`
+	ID                    int64                   `gorm:"primaryKey"`
+	EmpresaID             int64                   `gorm:"not null;index"`
+	LocalID               int64                   `gorm:"not null;index"`
+	BombaID               int64                   `gorm:"not null;index"`
+	BicoID                int64                   `gorm:"not null;index"`
+	Tipo                  Tipo                    `gorm:"type:varchar(20);not null;index"`
+	Data                  time.Time               `gorm:"not null;index"`
+	Quantidade            float64                 `gorm:"not null"`
+	PrecoUnitario         float64                 `gorm:"not null;default:0"`
+	ValorTotal            float64                 `gorm:"not null;default:0"`
+	Odometro              float64                 `gorm:"default:0"`
+	Horimetro             float64                 `gorm:"default:0"`
+	CombustivelID         int64                   `gorm:"not null;index"`
 	Combustivel           combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	PatrimonioID          int64 `gorm:"not null;index"`
-	FrentistaID           int64 `gorm:"not null;index"`
-	ReservatorioOrigemID  int64 `gorm:"not null;index"`
-	ReservatorioDestinoID int64 `gorm:"index"`
-	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
+	PatrimonioID          int64                   `gorm:"not null;index"`
+	FrentistaID           int64                   `gorm:"not null;index"`
+	ReservatorioOrigemID  int64                   `gorm:"not null;index"`
+	ReservatorioDestinoID int64                   `gorm:"index"`
+	shared.AuditFields    `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewAbastecimento(empresaID, localID int64, bomba *bomba.Bomba, origem *reservatorio.Reservatorio, frentistaID, patrimonioID, bicoID int64, quantidade, precoUnitario, odometro, horimetro float64) (*Abastecimento, error) {

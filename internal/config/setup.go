@@ -15,6 +15,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
+	"consumo-real-server/internal/application/abastecimento"
 	"consumo-real-server/internal/application/bomba"
 	combustivelapp "consumo-real-server/internal/application/combustivel"
 	"consumo-real-server/internal/application/empresa"
@@ -138,22 +139,26 @@ func Run() error {
 	entradaRepo := database.NewEntradaGORMRepository(db)
 	entradaService := entrada.NewService(entradaRepo, reservatorioRepo)
 
+	abastecimentoRepo := database.NewAbastecimentoGORMRepository(db)
+	abastecimentoService := abastecimento.NewService(abastecimentoRepo, bombaRepo, reservatorioRepo)
+
 	r := routes.NewRoutes(routes.Handlers{
-		Combustivel:  combustivelHandler,
-		Usuario:      routes.NewUsuarioHandler(usuarioService),
-		Auth:         routes.NewAuthHandler(usuarioService),
-		Empresa:      routes.NewEmpresaHandler(empresaService),
-		UnidadeAdmin: routes.NewUnidadeAdministrativaHandler(unidadeService),
-		Local:        routes.NewLocalHandler(localService),
-		Patrimonio:   routes.NewPatrimonioHandler(patrimonioService),
-		Reservatorio: routes.NewReservatorioHandler(reservatorioService),
-		Bomba:        routes.NewBombaHandler(bombaService),
-		Frentista:    routes.NewFrentistaHandler(frentistaService),
-		Fornecedor:   routes.NewFornecedorHandler(fornecedorService),
-		Preco:        routes.NewPrecoHandler(precoService),
-		Ordem:        routes.NewOrdemAbastecimentoHandler(ordemService),
-		Medicao:      routes.NewMedicaoHandler(medicaoService),
-		Entrada:      routes.NewEntradaHandler(entradaService),
+		Combustivel:   combustivelHandler,
+		Usuario:       routes.NewUsuarioHandler(usuarioService),
+		Auth:          routes.NewAuthHandler(usuarioService),
+		Empresa:       routes.NewEmpresaHandler(empresaService),
+		UnidadeAdmin:  routes.NewUnidadeAdministrativaHandler(unidadeService),
+		Local:         routes.NewLocalHandler(localService),
+		Patrimonio:    routes.NewPatrimonioHandler(patrimonioService),
+		Reservatorio:  routes.NewReservatorioHandler(reservatorioService),
+		Bomba:         routes.NewBombaHandler(bombaService),
+		Frentista:     routes.NewFrentistaHandler(frentistaService),
+		Fornecedor:    routes.NewFornecedorHandler(fornecedorService),
+		Preco:         routes.NewPrecoHandler(precoService),
+		Ordem:         routes.NewOrdemAbastecimentoHandler(ordemService),
+		Medicao:       routes.NewMedicaoHandler(medicaoService),
+		Entrada:       routes.NewEntradaHandler(entradaService),
+		Abastecimento: routes.NewAbastecimentoHandler(abastecimentoService),
 	}, tokens)
 
 	server := &http.Server{

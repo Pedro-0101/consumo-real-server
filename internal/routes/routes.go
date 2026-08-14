@@ -9,21 +9,22 @@ import (
 )
 
 type Handlers struct {
-	Combustivel  *CombustivelHandler
-	Usuario      *UsuarioHandler
-	Auth         *AuthHandler
-	Empresa      *EmpresaHandler
-	UnidadeAdmin *UnidadeAdministrativaHandler
-	Local        *LocalHandler
-	Patrimonio   *PatrimonioHandler
-	Reservatorio *ReservatorioHandler
-	Bomba        *BombaHandler
-	Frentista    *FrentistaHandler
-	Fornecedor   *FornecedorHandler
-	Preco        *PrecoHandler
-	Ordem        *OrdemAbastecimentoHandler
-	Medicao      *MedicaoHandler
-	Entrada      *EntradaHandler
+	Combustivel   *CombustivelHandler
+	Usuario       *UsuarioHandler
+	Auth          *AuthHandler
+	Empresa       *EmpresaHandler
+	UnidadeAdmin  *UnidadeAdministrativaHandler
+	Local         *LocalHandler
+	Patrimonio    *PatrimonioHandler
+	Reservatorio  *ReservatorioHandler
+	Bomba         *BombaHandler
+	Frentista     *FrentistaHandler
+	Fornecedor    *FornecedorHandler
+	Preco         *PrecoHandler
+	Ordem         *OrdemAbastecimentoHandler
+	Medicao       *MedicaoHandler
+	Entrada       *EntradaHandler
+	Abastecimento *AbastecimentoHandler
 }
 
 func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
@@ -126,6 +127,13 @@ func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
 	api.HandleFunc("/entradas/{id}", handlers.Entrada.get).Methods("GET")
 	api.HandleFunc("/entradas/{id}", handlers.Entrada.update).Methods("PUT")
 	api.HandleFunc("/entradas/{id}", handlers.Entrada.delete).Methods("DELETE")
+
+	api.HandleFunc("/abastecimentos", handlers.Abastecimento.list).Methods("GET")
+	api.HandleFunc("/abastecimentos", handlers.Abastecimento.create).Methods("POST")
+	api.HandleFunc("/abastecimentos/transferencias", handlers.Abastecimento.createTransferencia).Methods("POST")
+	api.HandleFunc("/abastecimentos/{id}", handlers.Abastecimento.get).Methods("GET")
+	api.HandleFunc("/abastecimentos/{id}", handlers.Abastecimento.update).Methods("PUT")
+	api.HandleFunc("/abastecimentos/{id}", handlers.Abastecimento.delete).Methods("DELETE")
 
 	return r
 }
