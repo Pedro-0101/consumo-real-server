@@ -27,7 +27,7 @@ func (r *ReservatorioGORMRepository) Update(ctx context.Context, reserv *reserva
 
 func (r *ReservatorioGORMRepository) FindByID(ctx context.Context, id int64) (*reservatorio.Reservatorio, error) {
 	var reserv reservatorio.Reservatorio
-	if err := r.db.WithContext(ctx).First(&reserv, id).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("Combustivel").First(&reserv, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, reservatorio.ErrNaoEncontrado
 		}

@@ -18,6 +18,7 @@ import (
 	"consumo-real-server/internal/application/bomba"
 	combustivelapp "consumo-real-server/internal/application/combustivel"
 	"consumo-real-server/internal/application/empresa"
+	"consumo-real-server/internal/application/entrada"
 	"consumo-real-server/internal/application/fornecedor"
 	"consumo-real-server/internal/application/frentista"
 	"consumo-real-server/internal/application/local"
@@ -134,6 +135,9 @@ func Run() error {
 	medicaoRepo := database.NewMedicaoGORMRepository(db)
 	medicaoService := medicao.NewService(medicaoRepo, reservatorioRepo)
 
+	entradaRepo := database.NewEntradaGORMRepository(db)
+	entradaService := entrada.NewService(entradaRepo, reservatorioRepo)
+
 	r := routes.NewRoutes(routes.Handlers{
 		Combustivel:  combustivelHandler,
 		Usuario:      routes.NewUsuarioHandler(usuarioService),
@@ -149,6 +153,7 @@ func Run() error {
 		Preco:        routes.NewPrecoHandler(precoService),
 		Ordem:        routes.NewOrdemAbastecimentoHandler(ordemService),
 		Medicao:      routes.NewMedicaoHandler(medicaoService),
+		Entrada:      routes.NewEntradaHandler(entradaService),
 	}, tokens)
 
 	server := &http.Server{

@@ -20,15 +20,15 @@ var (
 )
 
 type Entrada struct {
-	ID             int64 `gorm:"primaryKey"`
-	EmpresaID      int64 `gorm:"not null;index"`
-	FornecedorID   int64 `gorm:"not null;index"`
-	ReservatorioID int64 `gorm:"not null;index"`
-	CombustivelID  int64 `gorm:"not null;index"`
-	Combustivel    combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Quantidade     float64 `gorm:"not null"`
-	NotaFiscal     string `gorm:"size:60;index"`
-	Data           time.Time `gorm:"not null;index"`
+	ID                 int64                   `gorm:"primaryKey"`
+	EmpresaID          int64                   `gorm:"not null;index"`
+	FornecedorID       int64                   `gorm:"not null;index"`
+	ReservatorioID     int64                   `gorm:"not null;index"`
+	CombustivelID      int64                   `gorm:"not null;index"`
+	Combustivel        combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Quantidade         float64                 `gorm:"not null"`
+	NotaFiscal         string                  `gorm:"size:60;index"`
+	Data               time.Time               `gorm:"not null;index"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
