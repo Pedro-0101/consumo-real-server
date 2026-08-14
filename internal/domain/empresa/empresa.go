@@ -13,10 +13,10 @@ var (
 )
 
 type Empresa struct {
-	ID    int64 `gorm:"primaryKey"`
-	Nome  string `gorm:"size:255;not null"`
-	CNPJ  string `gorm:"size:20;not null;uniqueIndex"`
-	Ativo bool `gorm:"not null;default:true"`
+	ID                 int64  `gorm:"primaryKey"`
+	Nome               string `gorm:"size:255;not null"`
+	CNPJ               string `gorm:"size:20;not null;uniqueIndex"`
+	Ativo              bool   `gorm:"not null;default:true"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
@@ -37,6 +37,19 @@ func NewEmpresa(nome, cnpj string) (*Empresa, error) {
 
 func (e *Empresa) Desativar() {
 	e.Ativo = false
+}
+
+func (e *Empresa) Atualizar(nome, cnpj string) error {
+	if strings.TrimSpace(nome) == "" {
+		return ErrNomeObrigatorio
+	}
+	if !cnpjValido(cnpj) {
+		return ErrCNPJInvalido
+	}
+
+	e.Nome = strings.TrimSpace(nome)
+	e.CNPJ = strings.TrimSpace(cnpj)
+	return nil
 }
 
 func cnpjValido(cnpj string) bool {

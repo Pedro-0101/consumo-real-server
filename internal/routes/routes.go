@@ -12,6 +12,7 @@ type Handlers struct {
 	Combustivel *CombustivelHandler
 	Usuario     *UsuarioHandler
 	Auth        *AuthHandler
+	Empresa     *EmpresaHandler
 }
 
 func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
@@ -38,6 +39,12 @@ func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
 	api.HandleFunc("/usuarios/{id}", handlers.Usuario.update).Methods("PUT")
 	api.HandleFunc("/usuarios/{id}", handlers.Usuario.delete).Methods("DELETE")
 	api.HandleFunc("/usuarios/{id}/senha", handlers.Usuario.changePassword).Methods("PATCH")
+
+	api.HandleFunc("/empresas", handlers.Empresa.list).Methods("GET")
+	api.HandleFunc("/empresas", handlers.Empresa.create).Methods("POST")
+	api.HandleFunc("/empresas/{id}", handlers.Empresa.get).Methods("GET")
+	api.HandleFunc("/empresas/{id}", handlers.Empresa.update).Methods("PUT")
+	api.HandleFunc("/empresas/{id}", handlers.Empresa.delete).Methods("DELETE")
 
 	return r
 }

@@ -16,6 +16,7 @@ import (
 	"gorm.io/gorm"
 
 	combustivelapp "consumo-real-server/internal/application/combustivel"
+	"consumo-real-server/internal/application/empresa"
 	"consumo-real-server/internal/application/seeds"
 	"consumo-real-server/internal/application/usuario"
 	"consumo-real-server/internal/infrastructure/database"
@@ -90,10 +91,14 @@ func Run() error {
 	usuarioRepo := database.NewUsuarioGORMRepository(db)
 	usuarioService := usuario.NewService(usuarioRepo, hasher, tokens)
 
+	empresaRepo := database.NewEmpresaGORMRepository(db)
+	empresaService := empresa.NewService(empresaRepo)
+
 	r := routes.NewRoutes(routes.Handlers{
 		Combustivel: combustivelHandler,
 		Usuario:     routes.NewUsuarioHandler(usuarioService),
 		Auth:        routes.NewAuthHandler(usuarioService),
+		Empresa:     routes.NewEmpresaHandler(empresaService),
 	}, tokens)
 
 	server := &http.Server{
