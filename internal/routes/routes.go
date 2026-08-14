@@ -20,6 +20,7 @@ type Handlers struct {
 	Bomba        *BombaHandler
 	Frentista    *FrentistaHandler
 	Fornecedor   *FornecedorHandler
+	Preco        *PrecoHandler
 }
 
 func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
@@ -97,6 +98,12 @@ func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
 	api.HandleFunc("/fornecedores/{id}", handlers.Fornecedor.get).Methods("GET")
 	api.HandleFunc("/fornecedores/{id}", handlers.Fornecedor.update).Methods("PUT")
 	api.HandleFunc("/fornecedores/{id}", handlers.Fornecedor.delete).Methods("DELETE")
+
+	api.HandleFunc("/precos", handlers.Preco.list).Methods("GET")
+	api.HandleFunc("/precos", handlers.Preco.create).Methods("POST")
+	api.HandleFunc("/precos/{id}", handlers.Preco.get).Methods("GET")
+	api.HandleFunc("/precos/{id}", handlers.Preco.update).Methods("PUT")
+	api.HandleFunc("/precos/{id}", handlers.Preco.delete).Methods("DELETE")
 
 	return r
 }
