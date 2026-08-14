@@ -23,15 +23,15 @@ var (
 )
 
 type Reservatorio struct {
-	ID            int64 `gorm:"primaryKey"`
-	EmpresaID     int64 `gorm:"not null;index"`
-	Nome          string `gorm:"size:255;not null"`
-	Capacidade    float64 `gorm:"not null"`
-	NivelAtual    float64 `gorm:"not null;default:0"`
-	NivelMinimo   float64 `gorm:"not null;default:0"`
-	CombustivelID int64 `gorm:"not null;index"`
-	Combustivel   combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Ativo         bool `gorm:"not null;default:true"`
+	ID                 int64                   `gorm:"primaryKey"`
+	EmpresaID          int64                   `gorm:"not null;index"`
+	Nome               string                  `gorm:"size:255;not null"`
+	Capacidade         float64                 `gorm:"not null"`
+	NivelAtual         float64                 `gorm:"not null;default:0"`
+	NivelMinimo        float64                 `gorm:"not null;default:0"`
+	CombustivelID      int64                   `gorm:"not null;index"`
+	Combustivel        combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Ativo              bool                    `gorm:"not null;default:true"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
@@ -122,4 +122,29 @@ func (r *Reservatorio) AbaixoDoMinimo() bool {
 
 func (r *Reservatorio) Desativar() {
 	r.Ativo = false
+}
+
+func (r *Reservatorio) Atualizar(nome string, capacidade, nivelMinimo float64, combustivel combustivel.Combustivel) error {
+	if nome == "" {
+		return ErrNomeObrigatorio
+	}
+	if capacidade <= 0 {
+		return ErrCapacidadeInvalida
+	}
+	if nivelMinimo < 0 || nivelMinimo > capacidade {
+		return ErrNivelMinimoInvalido
+	}
+	if combustivel.ID == 0 {
+		return ErrCombustivelInvalido
+	}
+	if combustivel.EmpresaID != r.EmpresaID {
+		return ErrEmpresaIncompativel
+	}
+
+	r.Nome = nome
+	r.Capacidade = capacidade
+	r.NivelMinimo = nivelMinimo
+	r.CombustivelID = combustivel.ID
+	r.Combustivel = combustivel
+	return nil
 }

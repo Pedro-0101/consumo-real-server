@@ -19,6 +19,7 @@ import (
 	"consumo-real-server/internal/application/empresa"
 	"consumo-real-server/internal/application/local"
 	"consumo-real-server/internal/application/patrimonio"
+	"consumo-real-server/internal/application/reservatorio"
 	"consumo-real-server/internal/application/seeds"
 	"consumo-real-server/internal/application/unidadeadministrativa"
 	"consumo-real-server/internal/application/usuario"
@@ -106,6 +107,9 @@ func Run() error {
 	patrimonioRepo := database.NewPatrimonioGORMRepository(db)
 	patrimonioService := patrimonio.NewService(patrimonioRepo)
 
+	reservatorioRepo := database.NewReservatorioGORMRepository(db)
+	reservatorioService := reservatorio.NewService(reservatorioRepo)
+
 	r := routes.NewRoutes(routes.Handlers{
 		Combustivel:  combustivelHandler,
 		Usuario:      routes.NewUsuarioHandler(usuarioService),
@@ -114,6 +118,7 @@ func Run() error {
 		UnidadeAdmin: routes.NewUnidadeAdministrativaHandler(unidadeService),
 		Local:        routes.NewLocalHandler(localService),
 		Patrimonio:   routes.NewPatrimonioHandler(patrimonioService),
+		Reservatorio: routes.NewReservatorioHandler(reservatorioService),
 	}, tokens)
 
 	server := &http.Server{
