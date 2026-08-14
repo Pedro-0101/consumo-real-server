@@ -24,13 +24,13 @@ var (
 )
 
 type Usuario struct {
-	ID        int64 `gorm:"primaryKey"`
-	EmpresaID int64 `gorm:"index"`
-	Nome      string `gorm:"size:255;not null"`
-	Email     string `gorm:"size:255;not null;uniqueIndex"`
-	SenhaHash string `gorm:"size:255;not null"`
-	Papel     Papel `gorm:"type:varchar(20);not null;index"`
-	Ativo     bool `gorm:"not null;default:true"`
+	ID                 int64  `gorm:"primaryKey"`
+	EmpresaID          int64  `gorm:"index"`
+	Nome               string `gorm:"size:255;not null"`
+	Email              string `gorm:"size:255;not null;uniqueIndex"`
+	SenhaHash          string `gorm:"size:255;not null" json:"-"`
+	Papel              Papel  `gorm:"type:varchar(20);not null;index"`
+	Ativo              bool   `gorm:"not null;default:true"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
@@ -67,6 +67,35 @@ func NewAdminBase(nome, email, senhaHash string) (*Usuario, error) {
 
 func (u *Usuario) Desativar() {
 	u.Ativo = false
+}
+
+func (u *Usuario) Atualizar(nome, email string, papel Papel, empresaID int64) error {
+	if strings.TrimSpace(nome) == "" {
+		return ErrNomeObrigatorio
+	}
+	if !emailValido(email) {
+		return ErrEmailInvalido
+	}
+	if !papel.isValid() {
+		return ErrPapelInvalido
+	}
+	if papel != PapelAdminBase && empresaID <= 0 {
+		return ErrEmpresaObrigatoria
+	}
+
+	u.Nome = strings.TrimSpace(nome)
+	u.Email = strings.ToLower(strings.TrimSpace(email))
+	u.Papel = papel
+	u.EmpresaID = empresaID
+	return nil
+}
+
+func (u *Usuario) AlterarSenha(novaSenhaHash string) error {
+	if strings.TrimSpace(novaSenhaHash) == "" {
+		return ErrSenhaObrigatoria
+	}
+	u.SenhaHash = novaSenhaHash
+	return nil
 }
 
 func (p Papel) isValid() bool {

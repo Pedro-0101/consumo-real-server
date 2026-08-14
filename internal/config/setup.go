@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -14,15 +15,18 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
+	combustivelapp "consumo-real-server/internal/application/combustivel"
 	"consumo-real-server/internal/application/seeds"
+	"consumo-real-server/internal/application/usuario"
 	"consumo-real-server/internal/infrastructure/database"
+	"consumo-real-server/internal/infrastructure/security"
 	"consumo-real-server/internal/routes"
 	applogger "consumo-real-server/internal/shared/logger"
 )
 
 const (
-	dbMaxAttempts  = 10
-	dbRetryBase    = 2 * time.Second
+	dbMaxAttempts   = 10
+	dbRetryBase     = 2 * time.Second
 	shutdownTimeout = 5 * time.Second
 )
 
@@ -33,6 +37,9 @@ type Config struct {
 	AdminBaseNome  string
 	AdminBaseEmail string
 	AdminBaseSenha string
+
+	JWTSecret string
+	TokenTTL  time.Duration
 }
 
 // Run orquestra a inicialização completa do sistema:
@@ -73,10 +80,21 @@ func Run() error {
 	}
 	log.Info("seeds executados com sucesso", "fase", "seed")
 
-	r, err := routes.NewRoutes()
-	if err != nil {
-		return err
-	}
+	combustivelRepo := database.NewCombustivelGORMRepository(db)
+	combustivelService := combustivelapp.NewService(combustivelRepo)
+	combustivelHandler := routes.NewCombustivelHandler(combustivelService)
+
+	hasher := security.NewBcryptHasher()
+	tokens := security.NewJWTManager(cfg.JWTSecret, cfg.TokenTTL)
+
+	usuarioRepo := database.NewUsuarioGORMRepository(db)
+	usuarioService := usuario.NewService(usuarioRepo, hasher, tokens)
+
+	r := routes.NewRoutes(routes.Handlers{
+		Combustivel: combustivelHandler,
+		Usuario:     routes.NewUsuarioHandler(usuarioService),
+		Auth:        routes.NewAuthHandler(usuarioService),
+	}, tokens)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.ServerPort,
@@ -156,7 +174,19 @@ func loadConfig() Config {
 		AdminBaseNome:  envOr("ADMIN_BASE_NOME", "Administrador"),
 		AdminBaseEmail: envOr("ADMIN_BASE_EMAIL", "admin@consumoreal.com.br"),
 		AdminBaseSenha: envOr("ADMIN_BASE_SENHA", "admin123"),
+
+		JWTSecret: envOr("JWT_SECRET", "consumo-real-server-dev-secret"),
+		TokenTTL:  time.Duration(envIntOr("TOKEN_TTL_HORAS", 8)) * time.Hour,
 	}
+}
+
+func envIntOr(key string, fallback int) int {
+	if v := os.Getenv(key); v != "" {
+		if parsed, err := strconv.Atoi(v); err == nil {
+			return parsed
+		}
+	}
+	return fallback
 }
 
 func seedAdminBase(db *gorm.DB, cfg Config, log *slog.Logger) error {
