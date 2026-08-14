@@ -31,15 +31,15 @@ var (
 )
 
 type Combustivel struct {
-	ID         int64 `gorm:"primaryKey"`
-	EmpresaID  int64 `gorm:"not null;index"`
-	Nome       string `gorm:"size:255;not null"`
-	Tipo       Tipo `gorm:"type:varchar(30);not null"`
-	Unidade    Unidade `gorm:"type:varchar(20);not null"`
-	Densidade  float64 `gorm:"not null"`
-	PrecoCusto float64 `gorm:"not null;default:0"`
-	PrecoVenda float64 `gorm:"not null;default:0"`
-	Ativo      bool `gorm:"not null;default:true"`
+	ID                 int64   `gorm:"primaryKey"`
+	EmpresaID          int64   `gorm:"not null;index"`
+	Nome               string  `gorm:"size:255;not null"`
+	Tipo               Tipo    `gorm:"type:varchar(30);not null"`
+	Unidade            Unidade `gorm:"type:varchar(20);not null"`
+	Densidade          float64 `gorm:"not null"`
+	PrecoCusto         float64 `gorm:"not null;default:0"`
+	PrecoVenda         float64 `gorm:"not null;default:0"`
+	Ativo              bool    `gorm:"not null;default:true"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
@@ -73,6 +73,27 @@ func NewCombustivel(empresaID int64, nome string, tipo Tipo, unidade Unidade, de
 		PrecoVenda: precoVenda,
 		Ativo:      true,
 	}, nil
+}
+
+func (c *Combustivel) Atualizar(nome string, tipo Tipo, unidade Unidade, densidade float64) error {
+	if nome == "" {
+		return ErrNomeObrigatorio
+	}
+	if !tipo.isValid() {
+		return ErrTipoInvalido
+	}
+	if !unidade.isValid() {
+		return ErrUnidadeInvalida
+	}
+	if densidade <= 0 {
+		return ErrDensidadeInvalida
+	}
+
+	c.Nome = nome
+	c.Tipo = tipo
+	c.Unidade = unidade
+	c.Densidade = densidade
+	return nil
 }
 
 func (c *Combustivel) AtualizarPrecos(precoCusto, precoVenda float64) error {
