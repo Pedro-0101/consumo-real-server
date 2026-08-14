@@ -13,12 +13,12 @@ var (
 )
 
 type Frentista struct {
-	ID        int64 `gorm:"primaryKey"`
-	EmpresaID int64 `gorm:"not null;index"`
-	UsuarioID int64 `gorm:"index"`
-	Nome      string `gorm:"size:255;not null"`
-	Matricula string `gorm:"size:50;index"`
-	Ativo     bool `gorm:"not null;default:true"`
+	ID                 int64  `gorm:"primaryKey"`
+	EmpresaID          int64  `gorm:"not null;index"`
+	UsuarioID          int64  `gorm:"index"`
+	Nome               string `gorm:"size:255;not null"`
+	Matricula          string `gorm:"size:50;index"`
+	Ativo              bool   `gorm:"not null;default:true"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 
@@ -44,4 +44,14 @@ func (f *Frentista) VincularUsuario(usuarioID int64) {
 
 func (f *Frentista) Desativar() {
 	f.Ativo = false
+}
+
+func (f *Frentista) Atualizar(nome, matricula string) error {
+	if strings.TrimSpace(nome) == "" {
+		return ErrNomeObrigatorio
+	}
+
+	f.Nome = strings.TrimSpace(nome)
+	f.Matricula = strings.TrimSpace(matricula)
+	return nil
 }
