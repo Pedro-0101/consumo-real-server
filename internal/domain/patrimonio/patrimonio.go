@@ -29,17 +29,17 @@ var (
 )
 
 type Patrimonio struct {
-	ID                      int64 `gorm:"primaryKey"`
-	EmpresaID               int64 `gorm:"not null;index"`
-	UnidadeAdministrativaID int64 `gorm:"index"`
-	Nome                    string `gorm:"size:255;not null"`
-	Descricao               string `gorm:"type:text"`
-	Tipo                    string `gorm:"type:varchar(30);not null;index"`
-	TipoMedicao             TipoMedicao `gorm:"type:varchar(20);not null"`
-	CodigoExterno           string `gorm:"size:100;index"`
+	ID                      int64             `gorm:"primaryKey"`
+	EmpresaID               int64             `gorm:"not null;index"`
+	UnidadeAdministrativaID int64             `gorm:"index"`
+	Nome                    string            `gorm:"size:255;not null"`
+	Descricao               string            `gorm:"type:text"`
+	Tipo                    string            `gorm:"type:varchar(30);not null;index"`
+	TipoMedicao             TipoMedicao       `gorm:"type:varchar(20);not null"`
+	CodigoExterno           string            `gorm:"size:100;index"`
 	Atributos               map[string]string `gorm:"type:jsonb;serializer:json"`
-	Ativo                   bool `gorm:"not null;default:true"`
-	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
+	Ativo                   bool              `gorm:"not null;default:true"`
+	shared.AuditFields      `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewPatrimonio(empresaID int64, nome, tipo, codigoExterno string, tipoMedicao TipoMedicao) (*Patrimonio, error) {
@@ -80,6 +80,24 @@ func (p *Patrimonio) SetAtributo(chave, valor string) {
 
 func (p *Patrimonio) Desativar() {
 	p.Ativo = false
+}
+
+func (p *Patrimonio) Atualizar(nome, tipo, codigoExterno string, tipoMedicao TipoMedicao) error {
+	if strings.TrimSpace(nome) == "" {
+		return ErrNomeObrigatorio
+	}
+	if strings.TrimSpace(tipo) == "" {
+		return ErrTipoObrigatorio
+	}
+	if !tipoMedicao.isValid() {
+		return ErrTipoMedicaoInvalido
+	}
+
+	p.Nome = strings.TrimSpace(nome)
+	p.Tipo = strings.TrimSpace(tipo)
+	p.CodigoExterno = strings.TrimSpace(codigoExterno)
+	p.TipoMedicao = tipoMedicao
+	return nil
 }
 
 func (t TipoMedicao) isValid() bool {

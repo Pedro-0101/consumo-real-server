@@ -15,6 +15,7 @@ type Handlers struct {
 	Empresa      *EmpresaHandler
 	UnidadeAdmin *UnidadeAdministrativaHandler
 	Local        *LocalHandler
+	Patrimonio   *PatrimonioHandler
 }
 
 func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
@@ -59,6 +60,12 @@ func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
 	api.HandleFunc("/locais/{id}", handlers.Local.get).Methods("GET")
 	api.HandleFunc("/locais/{id}", handlers.Local.update).Methods("PUT")
 	api.HandleFunc("/locais/{id}", handlers.Local.delete).Methods("DELETE")
+
+	api.HandleFunc("/patrimonios", handlers.Patrimonio.list).Methods("GET")
+	api.HandleFunc("/patrimonios", handlers.Patrimonio.create).Methods("POST")
+	api.HandleFunc("/patrimonios/{id}", handlers.Patrimonio.get).Methods("GET")
+	api.HandleFunc("/patrimonios/{id}", handlers.Patrimonio.update).Methods("PUT")
+	api.HandleFunc("/patrimonios/{id}", handlers.Patrimonio.delete).Methods("DELETE")
 
 	return r
 }
