@@ -14,13 +14,13 @@ var (
 )
 
 type Local struct {
-	ID                      int64 `gorm:"primaryKey"`
-	EmpresaID               int64 `gorm:"not null;index"`
-	UnidadeAdministrativaID int64 `gorm:"not null;index"`
+	ID                      int64  `gorm:"primaryKey"`
+	EmpresaID               int64  `gorm:"not null;index"`
+	UnidadeAdministrativaID int64  `gorm:"not null;index"`
 	Nome                    string `gorm:"size:255;not null"`
 	Descricao               string `gorm:"type:text"`
-	Ativo                   bool `gorm:"not null;default:true"`
-	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
+	Ativo                   bool   `gorm:"not null;default:true"`
+	shared.AuditFields      `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewLocal(empresaID, unidadeAdministrativaID int64, nome, descricao string) (*Local, error) {
@@ -45,4 +45,18 @@ func NewLocal(empresaID, unidadeAdministrativaID int64, nome, descricao string) 
 
 func (l *Local) Desativar() {
 	l.Ativo = false
+}
+
+func (l *Local) Atualizar(unidadeAdministrativaID int64, nome, descricao string) error {
+	if unidadeAdministrativaID <= 0 {
+		return ErrUnidadeAdministrativaObrigatoria
+	}
+	if strings.TrimSpace(nome) == "" {
+		return ErrNomeObrigatorio
+	}
+
+	l.UnidadeAdministrativaID = unidadeAdministrativaID
+	l.Nome = strings.TrimSpace(nome)
+	l.Descricao = strings.TrimSpace(descricao)
+	return nil
 }

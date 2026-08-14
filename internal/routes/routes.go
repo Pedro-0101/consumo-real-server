@@ -14,6 +14,7 @@ type Handlers struct {
 	Auth         *AuthHandler
 	Empresa      *EmpresaHandler
 	UnidadeAdmin *UnidadeAdministrativaHandler
+	Local        *LocalHandler
 }
 
 func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
@@ -52,6 +53,12 @@ func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
 	api.HandleFunc("/unidades-administrativas/{id}", handlers.UnidadeAdmin.get).Methods("GET")
 	api.HandleFunc("/unidades-administrativas/{id}", handlers.UnidadeAdmin.update).Methods("PUT")
 	api.HandleFunc("/unidades-administrativas/{id}", handlers.UnidadeAdmin.delete).Methods("DELETE")
+
+	api.HandleFunc("/locais", handlers.Local.list).Methods("GET")
+	api.HandleFunc("/locais", handlers.Local.create).Methods("POST")
+	api.HandleFunc("/locais/{id}", handlers.Local.get).Methods("GET")
+	api.HandleFunc("/locais/{id}", handlers.Local.update).Methods("PUT")
+	api.HandleFunc("/locais/{id}", handlers.Local.delete).Methods("DELETE")
 
 	return r
 }
