@@ -9,10 +9,11 @@ import (
 )
 
 type Handlers struct {
-	Combustivel *CombustivelHandler
-	Usuario     *UsuarioHandler
-	Auth        *AuthHandler
-	Empresa     *EmpresaHandler
+	Combustivel  *CombustivelHandler
+	Usuario      *UsuarioHandler
+	Auth         *AuthHandler
+	Empresa      *EmpresaHandler
+	UnidadeAdmin *UnidadeAdministrativaHandler
 }
 
 func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
@@ -45,6 +46,12 @@ func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
 	api.HandleFunc("/empresas/{id}", handlers.Empresa.get).Methods("GET")
 	api.HandleFunc("/empresas/{id}", handlers.Empresa.update).Methods("PUT")
 	api.HandleFunc("/empresas/{id}", handlers.Empresa.delete).Methods("DELETE")
+
+	api.HandleFunc("/unidades-administrativas", handlers.UnidadeAdmin.list).Methods("GET")
+	api.HandleFunc("/unidades-administrativas", handlers.UnidadeAdmin.create).Methods("POST")
+	api.HandleFunc("/unidades-administrativas/{id}", handlers.UnidadeAdmin.get).Methods("GET")
+	api.HandleFunc("/unidades-administrativas/{id}", handlers.UnidadeAdmin.update).Methods("PUT")
+	api.HandleFunc("/unidades-administrativas/{id}", handlers.UnidadeAdmin.delete).Methods("DELETE")
 
 	return r
 }

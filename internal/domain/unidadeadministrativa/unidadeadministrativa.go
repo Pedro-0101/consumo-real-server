@@ -22,13 +22,13 @@ var (
 )
 
 type UnidadeAdministrativa struct {
-	ID                      int64 `gorm:"primaryKey"`
-	EmpresaID               int64 `gorm:"not null;index"`
-	UnidadeAdministrativaID int64 `gorm:"index"`
+	ID                      int64  `gorm:"primaryKey"`
+	EmpresaID               int64  `gorm:"not null;index"`
+	UnidadeAdministrativaID int64  `gorm:"index"`
 	Nome                    string `gorm:"size:255;not null"`
-	Tipo                    Tipo `gorm:"type:varchar(20);not null"`
-	Ativo                   bool `gorm:"not null;default:true"`
-	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
+	Tipo                    Tipo   `gorm:"type:varchar(20);not null"`
+	Ativo                   bool   `gorm:"not null;default:true"`
+	shared.AuditFields      `gorm:"embedded;embeddedPrefix:"`
 }
 
 func NewUnidadeAdministrativa(empresaID, unidadeAdministrativaID int64, nome string, tipo Tipo) (*UnidadeAdministrativa, error) {
@@ -53,6 +53,19 @@ func NewUnidadeAdministrativa(empresaID, unidadeAdministrativaID int64, nome str
 
 func (u *UnidadeAdministrativa) Desativar() {
 	u.Ativo = false
+}
+
+func (u *UnidadeAdministrativa) Atualizar(nome string, tipo Tipo) error {
+	if strings.TrimSpace(nome) == "" {
+		return ErrNomeObrigatorio
+	}
+	if !tipo.isValid() {
+		return ErrTipoInvalido
+	}
+
+	u.Nome = strings.TrimSpace(nome)
+	u.Tipo = tipo
+	return nil
 }
 
 func (t Tipo) isValid() bool {

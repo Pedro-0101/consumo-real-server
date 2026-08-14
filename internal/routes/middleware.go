@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"consumo-real-server/internal/shared/apperror"
@@ -46,4 +47,17 @@ func currentUserID(r *http.Request) int64 {
 		return 0
 	}
 	return claims.UsuarioID
+}
+
+// parseQueryInt64 retorna o valor do parâmetro de consulta como int64, ou 0.
+func parseQueryInt64(r *http.Request, key string) int64 {
+	raw := r.URL.Query().Get(key)
+	if raw == "" {
+		return 0
+	}
+	id, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return id
 }
