@@ -15,6 +15,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
+	"consumo-real-server/internal/application/bomba"
 	combustivelapp "consumo-real-server/internal/application/combustivel"
 	"consumo-real-server/internal/application/empresa"
 	"consumo-real-server/internal/application/local"
@@ -110,6 +111,9 @@ func Run() error {
 	reservatorioRepo := database.NewReservatorioGORMRepository(db)
 	reservatorioService := reservatorio.NewService(reservatorioRepo)
 
+	bombaRepo := database.NewBombaGORMRepository(db)
+	bombaService := bomba.NewService(bombaRepo)
+
 	r := routes.NewRoutes(routes.Handlers{
 		Combustivel:  combustivelHandler,
 		Usuario:      routes.NewUsuarioHandler(usuarioService),
@@ -119,6 +123,7 @@ func Run() error {
 		Local:        routes.NewLocalHandler(localService),
 		Patrimonio:   routes.NewPatrimonioHandler(patrimonioService),
 		Reservatorio: routes.NewReservatorioHandler(reservatorioService),
+		Bomba:        routes.NewBombaHandler(bombaService),
 	}, tokens)
 
 	server := &http.Server{
