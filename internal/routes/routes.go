@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -167,10 +168,12 @@ const swaggerUITemplate = `<!DOCTYPE html>
 <body>
   <div id="swagger-ui"></div>
   <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
+  <script id="swagger-spec" type="application/json">__SWAGGER_SPEC__</script>
   <script>
     window.onload = function () {
+      var spec = JSON.parse(document.getElementById("swagger-spec").textContent);
       window.ui = SwaggerUIBundle({
-        url: "/swagger/doc.json",
+        spec: spec,
         dom_id: "#swagger-ui",
         deepLinking: true,
         presets: [SwaggerUIBundle.presets.apis],
@@ -182,7 +185,10 @@ const swaggerUITemplate = `<!DOCTYPE html>
 </html>`
 
 // swaggerUIHandler serve a interface Swagger UI (Swagger UI é carregada via CDN).
+// A especificação é embutida na própria página para evitar requisições
+// adicionais (evita problemas de CORS, scheme e rede na carga do spec).
 func swaggerUIHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write([]byte(swaggerUITemplate))
+	spec := strings.ReplaceAll(string(docs.SwaggerJSON), "</", "<\\/")
+	_, _ = w.Write([]byte(strings.ReplaceAll(swaggerUITemplate, "__SWAGGER_SPEC__", spec)))
 }
