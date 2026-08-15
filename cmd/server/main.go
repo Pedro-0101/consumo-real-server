@@ -8,7 +8,7 @@
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-// @description Informe o token como: "Bearer {token}"
+// @description Cole apenas o token JWT (sem o prefixo "Bearer").
 package main
 
 import (

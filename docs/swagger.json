@@ -6216,7 +6216,7 @@
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "Informe o token como: \"Bearer {token}\"",
+            "description": "Cole apenas o token JWT (sem o prefixo \"Bearer\").",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

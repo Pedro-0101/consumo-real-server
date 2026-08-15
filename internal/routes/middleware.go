@@ -30,16 +30,24 @@ func middlewareAutenticacao(tokens auth.TokenManager) func(http.Handler) http.Ha
 	}
 }
 
-// bearerToken extrai o token do header Authorization (formato "Bearer <token>").
-// É tolerante a chaves/parênteses acidentais envolvendo o token ( ex.: "Bearer {token}"),
-// caso comum ao copiar o placeholder do Swagger UI.
+// bearerToken extrai o token do header Authorization.
+// Aceita tanto "Bearer <token>" quanto o token puro ("<token>"),
+// permitindo colar apenas o token no Swagger UI.
+// É tolerante a chaves/parênteses acidentais envolvendo o token.
 func bearerToken(r *http.Request) (string, bool) {
-	header := r.Header.Get("Authorization")
-	parts := strings.Fields(header)
-	if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
+	header := strings.TrimSpace(r.Header.Get("Authorization"))
+	if header == "" {
 		return "", false
 	}
-	token := strings.TrimSpace(parts[1])
+
+	var token string
+	if parts := strings.Fields(header); len(parts) == 2 && strings.EqualFold(parts[0], "Bearer") {
+		token = parts[1]
+	} else {
+		token = header
+	}
+
+	token = strings.TrimSpace(token)
 	token = strings.Trim(token, "{}()")
 	return token, token != ""
 }
