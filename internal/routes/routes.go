@@ -172,6 +172,10 @@ const swaggerUITemplate = `<!DOCTYPE html>
   <script>
     window.onload = function () {
       var spec = JSON.parse(document.getElementById("swagger-spec").textContent);
+      // Usa a mesma origem da página para evitar erros de CORS:
+      // o host do spec passa a ser o host do navegador, garantindo same-origin.
+      spec.host = window.location.host;
+      spec.schemes = [window.location.protocol.replace(":", "")];
       window.ui = SwaggerUIBundle({
         spec: spec,
         dom_id: "#swagger-ui",
