@@ -4,7 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"consumo-real-server/internal/shared"
+	shared "consumo-real-server/internal/shared"
+	helper "consumo-real-server/internal/shared/helper"
 )
 
 var (
@@ -21,10 +22,11 @@ type Empresa struct {
 }
 
 func NewEmpresa(nome, cnpj string) (*Empresa, error) {
+
 	if strings.TrimSpace(nome) == "" {
 		return nil, ErrNomeObrigatorio
 	}
-	if !cnpjValido(cnpj) {
+	if !helper.IsValidCNPJ(cnpj) {
 		return nil, ErrCNPJInvalido
 	}
 
@@ -43,21 +45,11 @@ func (e *Empresa) Atualizar(nome, cnpj string) error {
 	if strings.TrimSpace(nome) == "" {
 		return ErrNomeObrigatorio
 	}
-	if !cnpjValido(cnpj) {
+	if !helper.IsValidCNPJ(cnpj) {
 		return ErrCNPJInvalido
 	}
 
 	e.Nome = strings.TrimSpace(nome)
 	e.CNPJ = strings.TrimSpace(cnpj)
 	return nil
-}
-
-func cnpjValido(cnpj string) bool {
-	var digits strings.Builder
-	for _, r := range cnpj {
-		if r >= '0' && r <= '9' {
-			digits.WriteRune(r)
-		}
-	}
-	return digits.Len() == 14
 }
