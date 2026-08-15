@@ -25,6 +25,20 @@ type patrimonioRequestBody struct {
 	TipoMedicao   string `json:"tipo_medicao"`
 }
 
+// CreatePatrimonio cadastra um novo patrimônio.
+// @Summary Cadastrar Patrimônio
+// @Description Cria um novo patrimônio no sistema.
+// @Tags Patrimônios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param patrimonio body patrimonioRequestBody true "Dados do patrimônio"
+// @Success 201 {object} domainpatrimonio.Patrimonio
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /patrimonios [post]
 func (h *PatrimonioHandler) create(w http.ResponseWriter, r *http.Request) {
 	var body patrimonioRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -47,6 +61,22 @@ func (h *PatrimonioHandler) create(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusCreated, p)
 }
 
+// UpdatePatrimonio atualiza os dados de um patrimônio existente.
+// @Summary Atualizar Patrimônio
+// @Description Atualiza os dados de um patrimônio.
+// @Tags Patrimônios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do patrimônio"
+// @Param patrimonio body patrimonioRequestBody true "Dados atualizados do patrimônio"
+// @Success 200 {object} domainpatrimonio.Patrimonio
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /patrimonios/{id} [put]
 func (h *PatrimonioHandler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -75,6 +105,18 @@ func (h *PatrimonioHandler) update(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, p)
 }
 
+// DeletePatrimonio remove um patrimônio do sistema.
+// @Summary Excluir Patrimônio
+// @Description Remove um patrimônio do sistema.
+// @Tags Patrimônios
+// @Security BearerAuth
+// @Param id path int true "ID do patrimônio"
+// @Success 204 "Patrimônio excluído com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /patrimonios/{id} [delete]
 func (h *PatrimonioHandler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -92,6 +134,19 @@ func (h *PatrimonioHandler) delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetPatrimonio retorna os dados de um patrimônio.
+// @Summary Buscar Patrimônio por ID
+// @Description Retorna os dados completos de um patrimônio.
+// @Tags Patrimônios
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do patrimônio"
+// @Success 200 {object} domainpatrimonio.Patrimonio
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /patrimonios/{id} [get]
 func (h *PatrimonioHandler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -107,6 +162,18 @@ func (h *PatrimonioHandler) get(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, p)
 }
 
+// ListPatrimonios lista patrimônios com filtros opcionais.
+// @Summary Listar Patrimônios
+// @Description Lista os patrimônios, podendo aplicar filtros.
+// @Tags Patrimônios
+// @Produce json
+// @Security BearerAuth
+// @Param ativo query bool false "Filtrar apenas registros ativos"
+// @Success 200 {array} domainpatrimonio.Patrimonio
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /patrimonios [get]
 func (h *PatrimonioHandler) list(w http.ResponseWriter, r *http.Request) {
 	var ativo *bool
 	if raw := r.URL.Query().Get("ativo"); raw != "" {

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	abastecimentoapp "consumo-real-server/internal/application/abastecimento"
+	_ "consumo-real-server/internal/domain/abastecimento"
 	"consumo-real-server/internal/shared/apperror"
 )
 
@@ -28,6 +29,20 @@ type abastecimentoRequestBody struct {
 	Horimetro     float64 `json:"horimetro"`
 }
 
+// CreateAbastecimento registra um novo abastecimento.
+// @Summary Cadastrar Abastecimento
+// @Description Registra um novo abastecimento de combustível.
+// @Tags Abastecimentos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param abastecimento body abastecimentoRequestBody true "Dados do abastecimento"
+// @Success 201 {object} abastecimento.Abastecimento
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /abastecimentos [post]
 func (h *AbastecimentoHandler) create(w http.ResponseWriter, r *http.Request) {
 	var body abastecimentoRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -62,6 +77,20 @@ type transferenciaRequestBody struct {
 	Quantidade float64 `json:"quantidade"`
 }
 
+// CreateTransferencia registra uma transferência entre reservatórios.
+// @Summary Registrar transferência
+// @Description Registra uma transferência de combustível entre reservatórios.
+// @Tags Abastecimentos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param transferencia body transferenciaRequestBody true "Dados da transferência"
+// @Success 201 {object} abastecimento.Abastecimento
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /abastecimentos/transferencias [post]
 func (h *AbastecimentoHandler) createTransferencia(w http.ResponseWriter, r *http.Request) {
 	var body transferenciaRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -89,6 +118,22 @@ type abastecimentoUpdateRequestBody struct {
 	Horimetro     float64 `json:"horimetro"`
 }
 
+// UpdateAbastecimento atualiza os dados de um abastecimento existente.
+// @Summary Atualizar Abastecimento
+// @Description Atualiza os dados de um abastecimento.
+// @Tags Abastecimentos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do abastecimento"
+// @Param abastecimento body abastecimentoUpdateRequestBody true "Dados atualizados do abastecimento"
+// @Success 200 {object} abastecimento.Abastecimento
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /abastecimentos/{id} [put]
 func (h *AbastecimentoHandler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -116,6 +161,18 @@ func (h *AbastecimentoHandler) update(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, a)
 }
 
+// DeleteAbastecimento remove um abastecimento do sistema.
+// @Summary Excluir Abastecimento
+// @Description Remove um abastecimento do sistema.
+// @Tags Abastecimentos
+// @Security BearerAuth
+// @Param id path int true "ID do abastecimento"
+// @Success 204 "Abastecimento excluído com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /abastecimentos/{id} [delete]
 func (h *AbastecimentoHandler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -133,6 +190,19 @@ func (h *AbastecimentoHandler) delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetAbastecimento retorna os dados de um abastecimento.
+// @Summary Buscar Abastecimento por ID
+// @Description Retorna os dados completos de um abastecimento.
+// @Tags Abastecimentos
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do abastecimento"
+// @Success 200 {object} abastecimento.Abastecimento
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /abastecimentos/{id} [get]
 func (h *AbastecimentoHandler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -148,6 +218,24 @@ func (h *AbastecimentoHandler) get(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, a)
 }
 
+// ListAbastecimentos lista abastecimentos com filtros opcionais.
+// @Summary Listar Abastecimentos
+// @Description Lista os abastecimentos, podendo aplicar filtros.
+// @Tags Abastecimentos
+// @Produce json
+// @Security BearerAuth
+// @Param empresa_id query int false "ID da empresa"
+// @Param local_id query int false "ID do local"
+// @Param bomba_id query int false "ID da bomba"
+// @Param patrimonio_id query int false "ID do patrimônio"
+// @Param frentista_id query int false "ID do frentista"
+// @Param combustivel_id query int false "ID do combustível"
+// @Param tipo query string false "Tipo (ABASTECIMENTO, TRANSFERENCIA)"
+// @Success 200 {array} abastecimento.Abastecimento
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /abastecimentos [get]
 func (h *AbastecimentoHandler) list(w http.ResponseWriter, r *http.Request) {
 	list, err := h.service.List.Handle(r.Context(), abastecimentoapp.ListQuery{
 		EmpresaID:     parseQueryInt64(r, "empresa_id"),

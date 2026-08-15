@@ -1,3 +1,14 @@
+// @title API Consumo Real
+// @version 1.0
+// @description API de controle de consumo real de combustível. Todas as rotas sob /api exigem autenticação via Bearer Token, exceto /api/auth/login.
+// @host localhost:8080
+// @BasePath /api
+// @schemes http
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Informe o token como: "Bearer {token}"
 package main
 
 import (

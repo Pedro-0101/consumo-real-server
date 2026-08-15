@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	empresaapp "consumo-real-server/internal/application/empresa"
+	_ "consumo-real-server/internal/domain/empresa"
 	"consumo-real-server/internal/shared/apperror"
 )
 
@@ -21,6 +22,20 @@ type empresaRequestBody struct {
 	CNPJ string `json:"cnpj"`
 }
 
+// CreateEmpresa cadastra uma nova empresa.
+// @Summary Cadastrar Empresa
+// @Description Cria uma nova empresa no sistema.
+// @Tags Empresas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param empresa body empresaRequestBody true "Dados da empresa"
+// @Success 201 {object} empresa.Empresa
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /empresas [post]
 func (h *EmpresaHandler) create(w http.ResponseWriter, r *http.Request) {
 	var body empresaRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -40,6 +55,22 @@ func (h *EmpresaHandler) create(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusCreated, e)
 }
 
+// UpdateEmpresa atualiza os dados de uma empresa existente.
+// @Summary Atualizar Empresa
+// @Description Atualiza os dados de uma empresa.
+// @Tags Empresas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID da empresa"
+// @Param empresa body empresaRequestBody true "Dados atualizados da empresa"
+// @Success 200 {object} empresa.Empresa
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /empresas/{id} [put]
 func (h *EmpresaHandler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -66,6 +97,18 @@ func (h *EmpresaHandler) update(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, e)
 }
 
+// DeleteEmpresa remove uma empresa do sistema.
+// @Summary Excluir Empresa
+// @Description Remove uma empresa do sistema.
+// @Tags Empresas
+// @Security BearerAuth
+// @Param id path int true "ID da empresa"
+// @Success 204 "Empresa excluída com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /empresas/{id} [delete]
 func (h *EmpresaHandler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -83,6 +126,19 @@ func (h *EmpresaHandler) delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetEmpresa retorna os dados de uma empresa.
+// @Summary Buscar Empresa por ID
+// @Description Retorna os dados completos de uma empresa.
+// @Tags Empresas
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID da empresa"
+// @Success 200 {object} empresa.Empresa
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /empresas/{id} [get]
 func (h *EmpresaHandler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -98,6 +154,18 @@ func (h *EmpresaHandler) get(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, e)
 }
 
+// ListEmpresas lista empresas com filtros opcionais.
+// @Summary Listar Empresas
+// @Description Lista as empresas, podendo aplicar filtros.
+// @Tags Empresas
+// @Produce json
+// @Security BearerAuth
+// @Param ativo query bool false "Filtrar apenas registros ativos"
+// @Success 200 {array} empresa.Empresa
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /empresas [get]
 func (h *EmpresaHandler) list(w http.ResponseWriter, r *http.Request) {
 	var ativo *bool
 	if raw := r.URL.Query().Get("ativo"); raw != "" {

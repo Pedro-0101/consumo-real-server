@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	reservatorioapp "consumo-real-server/internal/application/reservatorio"
+	_ "consumo-real-server/internal/domain/reservatorio"
 	"consumo-real-server/internal/shared/apperror"
 )
 
@@ -25,6 +26,20 @@ type reservatorioRequestBody struct {
 	CombustivelID int64   `json:"combustivel_id"`
 }
 
+// CreateReservatorio cadastra um novo reservatório.
+// @Summary Cadastrar reservatório
+// @Description Cria um novo reservatório no sistema.
+// @Tags Reservatórios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param reservatorio body reservatorioRequestBody true "Dados do reservatório"
+// @Success 201 {object} reservatorio.Reservatorio
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /reservatorios [post]
 func (h *ReservatorioHandler) create(w http.ResponseWriter, r *http.Request) {
 	var body reservatorioRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -48,6 +63,22 @@ func (h *ReservatorioHandler) create(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusCreated, reserv)
 }
 
+// UpdateReservatorio atualiza os dados de um reservatório existente.
+// @Summary Atualizar reservatório
+// @Description Atualiza os dados de um reservatório.
+// @Tags Reservatórios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do reservatório"
+// @Param reservatorio body reservatorioRequestBody true "Dados atualizados do reservatório"
+// @Success 200 {object} reservatorio.Reservatorio
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /reservatorios/{id} [put]
 func (h *ReservatorioHandler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -76,6 +107,18 @@ func (h *ReservatorioHandler) update(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, reserv)
 }
 
+// DeleteReservatorio remove um reservatório do sistema.
+// @Summary Excluir reservatório
+// @Description Remove um reservatório do sistema.
+// @Tags Reservatórios
+// @Security BearerAuth
+// @Param id path int true "ID do reservatório"
+// @Success 204 "Reservatório excluído com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /reservatorios/{id} [delete]
 func (h *ReservatorioHandler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -93,6 +136,19 @@ func (h *ReservatorioHandler) delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetReservatorio retorna os dados de um reservatório.
+// @Summary Buscar reservatório por ID
+// @Description Retorna os dados completos de um reservatório.
+// @Tags Reservatórios
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do reservatório"
+// @Success 200 {object} reservatorio.Reservatorio
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /reservatorios/{id} [get]
 func (h *ReservatorioHandler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -108,6 +164,18 @@ func (h *ReservatorioHandler) get(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, reserv)
 }
 
+// ListReservatorios lista reservatórios com filtros opcionais.
+// @Summary Listar reservatórios
+// @Description Lista os reservatórios, podendo aplicar filtros.
+// @Tags Reservatórios
+// @Produce json
+// @Security BearerAuth
+// @Param ativo query bool false "Filtrar apenas registros ativos"
+// @Success 200 {array} reservatorio.Reservatorio
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /reservatorios [get]
 func (h *ReservatorioHandler) list(w http.ResponseWriter, r *http.Request) {
 	var ativo *bool
 	if raw := r.URL.Query().Get("ativo"); raw != "" {

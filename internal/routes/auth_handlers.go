@@ -15,11 +15,26 @@ func NewAuthHandler(service *usuarioapp.Service) *AuthHandler {
 	return &AuthHandler{service: service}
 }
 
+type loginRequestBody struct {
+	Email string `json:"email"`
+	Senha string `json:"senha"`
+}
+
+// Login efetua a autenticação do usuário e retorna o token JWT.
+// @Summary Autenticar usuário
+// @Description Autentica o usuário com e-mail e senha, retornando um token JWT de acesso.
+// @Tags Autenticação
+// @Accept json
+// @Produce json
+// @Param login body loginRequestBody true "Credenciais de acesso"
+// @Success 200 {object} usuarioapp.LoginResult
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /auth/login [post]
 func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
-	var body struct {
-		Email string `json:"email"`
-		Senha string `json:"senha"`
-	}
+	var body loginRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
 		apperror.WriteError(w, err)
 		return

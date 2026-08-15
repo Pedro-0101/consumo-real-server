@@ -21,13 +21,15 @@ func StatusCode(e *AppError) int {
 	return http.StatusInternalServerError
 }
 
-type errorResponse struct {
-	Error errorBody `json:"error"`
-}
-
-type errorBody struct {
+// ErrorBody é o corpo do erro padronizado retornado pela API.
+type ErrorBody struct {
 	Kind    Kind   `json:"kind"`
 	Message string `json:"message"`
+}
+
+// ErrorResponse é a resposta padronizada de erro da API.
+type ErrorResponse struct {
+	Error ErrorBody `json:"error"`
 }
 
 // WriteError serializa qualquer erro como resposta JSON padronizada.
@@ -37,8 +39,8 @@ func WriteError(w http.ResponseWriter, err error) {
 	if !ok {
 		ae = &AppError{Kind: KindInternal, Message: "erro interno", Cause: err}
 	}
-	WriteJSON(w, StatusCode(ae), errorResponse{
-		Error: errorBody{Kind: ae.Kind, Message: ae.Message},
+	WriteJSON(w, StatusCode(ae), ErrorResponse{
+		Error: ErrorBody{Kind: ae.Kind, Message: ae.Message},
 	})
 }
 

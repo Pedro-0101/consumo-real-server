@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	entradaapp "consumo-real-server/internal/application/entrada"
+	_ "consumo-real-server/internal/domain/entrada"
 	"consumo-real-server/internal/shared/apperror"
 )
 
@@ -23,6 +24,20 @@ type entradaRequestBody struct {
 	NotaFiscal     string  `json:"nota_fiscal"`
 }
 
+// CreateEntrada registra uma nova entrada de combustível.
+// @Summary Cadastrar Entrada
+// @Description Registra uma nova entrada de combustível.
+// @Tags Entradas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param entrada body entradaRequestBody true "Dados da entrada"
+// @Success 201 {object} entrada.Entrada
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /entradas [post]
 func (h *EntradaHandler) create(w http.ResponseWriter, r *http.Request) {
 	var body entradaRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -45,6 +60,22 @@ func (h *EntradaHandler) create(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusCreated, e)
 }
 
+// UpdateEntrada atualiza os dados de uma entrada existente.
+// @Summary Atualizar Entrada
+// @Description Atualiza os dados de uma entrada.
+// @Tags Entradas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID da entrada"
+// @Param entrada body entradaRequestBody true "Dados atualizados da entrada"
+// @Success 200 {object} entrada.Entrada
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /entradas/{id} [put]
 func (h *EntradaHandler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -70,6 +101,18 @@ func (h *EntradaHandler) update(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, e)
 }
 
+// DeleteEntrada remove uma entrada do sistema.
+// @Summary Excluir Entrada
+// @Description Remove uma entrada do sistema.
+// @Tags Entradas
+// @Security BearerAuth
+// @Param id path int true "ID da entrada"
+// @Success 204 "Entrada excluída com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /entradas/{id} [delete]
 func (h *EntradaHandler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -87,6 +130,19 @@ func (h *EntradaHandler) delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetEntrada retorna os dados de uma entrada.
+// @Summary Buscar Entrada por ID
+// @Description Retorna os dados completos de uma entrada.
+// @Tags Entradas
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID da entrada"
+// @Success 200 {object} entrada.Entrada
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /entradas/{id} [get]
 func (h *EntradaHandler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -102,6 +158,21 @@ func (h *EntradaHandler) get(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, e)
 }
 
+// ListEntradas lista entradas com filtros opcionais.
+// @Summary Listar Entradas
+// @Description Lista as entradas, podendo aplicar filtros.
+// @Tags Entradas
+// @Produce json
+// @Security BearerAuth
+// @Param empresa_id query int false "ID da empresa"
+// @Param fornecedor_id query int false "ID do fornecedor"
+// @Param reservatorio_id query int false "ID do reservatório"
+// @Param combustivel_id query int false "ID do combustível"
+// @Success 200 {array} entrada.Entrada
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /entradas [get]
 func (h *EntradaHandler) list(w http.ResponseWriter, r *http.Request) {
 	list, err := h.service.List.Handle(r.Context(), entradaapp.ListQuery{
 		EmpresaID:      parseQueryInt64(r, "empresa_id"),

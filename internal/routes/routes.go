@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"consumo-real-server/docs"
 	"consumo-real-server/internal/shared/auth"
 )
 
@@ -30,6 +31,9 @@ type Handlers struct {
 func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/health", healthHandler).Methods("GET")
+	r.HandleFunc("/swagger", swaggerUIHandler).Methods("GET")
+	r.HandleFunc("/swagger/", swaggerUIHandler).Methods("GET")
+	r.HandleFunc("/swagger/doc.json", swaggerDocHandler).Methods("GET")
 
 	// Rotas públicas
 	r.HandleFunc("/api/auth/login", handlers.Auth.login).Methods("POST")
@@ -141,4 +145,44 @@ func NewRoutes(handlers Handlers, tokens auth.TokenManager) *mux.Router {
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+
+// swaggerDocHandler serve a especificação Swagger 2.0 gerada automaticamente.
+func swaggerDocHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "no-cache")
+	_, _ = w.Write(docs.SwaggerJSON)
+}
+
+const swaggerUITemplate = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>API Consumo Real - Documentação</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+  <style>
+    body { margin: 0; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
+  <script>
+    window.onload = function () {
+      window.ui = SwaggerUIBundle({
+        url: "/swagger/doc.json",
+        dom_id: "#swagger-ui",
+        deepLinking: true,
+        presets: [SwaggerUIBundle.presets.apis],
+        layout: "BaseLayout"
+      });
+    };
+  </script>
+</body>
+</html>`
+
+// swaggerUIHandler serve a interface Swagger UI (Swagger UI é carregada via CDN).
+func swaggerUIHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, _ = w.Write([]byte(swaggerUITemplate))
 }

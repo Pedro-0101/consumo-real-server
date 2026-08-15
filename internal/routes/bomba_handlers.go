@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	bombaapp "consumo-real-server/internal/application/bomba"
+	_ "consumo-real-server/internal/domain/bomba"
 	"consumo-real-server/internal/shared/apperror"
 )
 
@@ -25,6 +26,20 @@ type bombaRequestBody struct {
 	Descricao      string `json:"descricao"`
 }
 
+// CreateBomba cadastra uma nova bomba.
+// @Summary Cadastrar bomba
+// @Description Cria uma nova bomba no sistema.
+// @Tags Bombas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param bomba body bombaRequestBody true "Dados da bomba"
+// @Success 201 {object} bomba.Bomba
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /bombas [post]
 func (h *BombaHandler) create(w http.ResponseWriter, r *http.Request) {
 	var body bombaRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -48,6 +63,22 @@ func (h *BombaHandler) create(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusCreated, bomba)
 }
 
+// UpdateBomba atualiza os dados de uma bomba existente.
+// @Summary Atualizar bomba
+// @Description Atualiza os dados de uma bomba.
+// @Tags Bombas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID da bomba"
+// @Param bomba body bombaRequestBody true "Dados atualizados da bomba"
+// @Success 200 {object} bomba.Bomba
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /bombas/{id} [put]
 func (h *BombaHandler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -77,6 +108,18 @@ func (h *BombaHandler) update(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, bomba)
 }
 
+// DeleteBomba remove uma bomba do sistema.
+// @Summary Excluir bomba
+// @Description Remove uma bomba do sistema.
+// @Tags Bombas
+// @Security BearerAuth
+// @Param id path int true "ID da bomba"
+// @Success 204 "Bomba excluída com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /bombas/{id} [delete]
 func (h *BombaHandler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -94,6 +137,19 @@ func (h *BombaHandler) delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetBomba retorna os dados de uma bomba.
+// @Summary Buscar bomba por ID
+// @Description Retorna os dados completos de uma bomba.
+// @Tags Bombas
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID da bomba"
+// @Success 200 {object} bomba.Bomba
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /bombas/{id} [get]
 func (h *BombaHandler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -109,6 +165,18 @@ func (h *BombaHandler) get(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, bomba)
 }
 
+// ListBombas lista bombas com filtros opcionais.
+// @Summary Listar bombas
+// @Description Lista as bombas, podendo aplicar filtros.
+// @Tags Bombas
+// @Produce json
+// @Security BearerAuth
+// @Param ativo query bool false "Filtrar apenas registros ativos"
+// @Success 200 {array} bomba.Bomba
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /bombas [get]
 func (h *BombaHandler) list(w http.ResponseWriter, r *http.Request) {
 	var ativo *bool
 	if raw := r.URL.Query().Get("ativo"); raw != "" {
@@ -137,6 +205,22 @@ type bicoRequestBody struct {
 	Nome string `json:"nome"`
 }
 
+// AdicionarBico adiciona um bico a uma bomba.
+// @Summary Adicionar bico
+// @Description Adiciona um novo bico a uma bomba existente.
+// @Tags Bombas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID da bomba"
+// @Param bico body bicoRequestBody true "Dados do bico"
+// @Success 201 {object} bomba.Bico
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /bombas/{id}/bicos [post]
 func (h *BombaHandler) adicionarBico(w http.ResponseWriter, r *http.Request) {
 	bombaID, ok := pathID(r)
 	if !ok {
@@ -162,6 +246,19 @@ func (h *BombaHandler) adicionarBico(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusCreated, bico)
 }
 
+// DesativarBico desativa um bico de uma bomba.
+// @Summary Desativar bico
+// @Description Desativa um bico de uma bomba existente.
+// @Tags Bombas
+// @Security BearerAuth
+// @Param id path int true "ID da bomba"
+// @Param bico_id query int true "ID do bico"
+// @Success 204 "Bico desativado com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /bombas/{id}/bicos [delete]
 func (h *BombaHandler) desativarBico(w http.ResponseWriter, r *http.Request) {
 	bombaID, ok := pathID(r)
 	if !ok {

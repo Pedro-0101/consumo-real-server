@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	fornecedorapp "consumo-real-server/internal/application/fornecedor"
+	_ "consumo-real-server/internal/domain/fornecedor"
 	"consumo-real-server/internal/shared/apperror"
 )
 
@@ -22,6 +23,20 @@ type fornecedorRequestBody struct {
 	CNPJ      string `json:"cnpj"`
 }
 
+// CreateFornecedor cadastra um novo fornecedor.
+// @Summary Cadastrar fornecedor
+// @Description Cria um novo fornecedor no sistema.
+// @Tags Fornecedores
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param fornecedor body fornecedorRequestBody true "Dados do fornecedor"
+// @Success 201 {object} fornecedor.Fornecedor
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /fornecedores [post]
 func (h *FornecedorHandler) create(w http.ResponseWriter, r *http.Request) {
 	var body fornecedorRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -42,6 +57,22 @@ func (h *FornecedorHandler) create(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusCreated, f)
 }
 
+// UpdateFornecedor atualiza os dados de um fornecedor existente.
+// @Summary Atualizar fornecedor
+// @Description Atualiza os dados de um fornecedor.
+// @Tags Fornecedores
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do fornecedor"
+// @Param fornecedor body fornecedorRequestBody true "Dados atualizados do fornecedor"
+// @Success 200 {object} fornecedor.Fornecedor
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /fornecedores/{id} [put]
 func (h *FornecedorHandler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -68,6 +99,18 @@ func (h *FornecedorHandler) update(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, f)
 }
 
+// DeleteFornecedor remove um fornecedor do sistema.
+// @Summary Excluir fornecedor
+// @Description Remove um fornecedor do sistema.
+// @Tags Fornecedores
+// @Security BearerAuth
+// @Param id path int true "ID do fornecedor"
+// @Success 204 "Fornecedor excluído com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /fornecedores/{id} [delete]
 func (h *FornecedorHandler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -85,6 +128,19 @@ func (h *FornecedorHandler) delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetFornecedor retorna os dados de um fornecedor.
+// @Summary Buscar fornecedor por ID
+// @Description Retorna os dados completos de um fornecedor.
+// @Tags Fornecedores
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do fornecedor"
+// @Success 200 {object} fornecedor.Fornecedor
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /fornecedores/{id} [get]
 func (h *FornecedorHandler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -100,6 +156,18 @@ func (h *FornecedorHandler) get(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, f)
 }
 
+// ListFornecedores lista fornecedores com filtros opcionais.
+// @Summary Listar fornecedores
+// @Description Lista os fornecedores, podendo aplicar filtros.
+// @Tags Fornecedores
+// @Produce json
+// @Security BearerAuth
+// @Param ativo query bool false "Filtrar apenas registros ativos"
+// @Success 200 {array} fornecedor.Fornecedor
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /fornecedores [get]
 func (h *FornecedorHandler) list(w http.ResponseWriter, r *http.Request) {
 	var ativo *bool
 	if raw := r.URL.Query().Get("ativo"); raw != "" {

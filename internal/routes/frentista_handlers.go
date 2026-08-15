@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	frentistaapp "consumo-real-server/internal/application/frentista"
+	_ "consumo-real-server/internal/domain/frentista"
 	"consumo-real-server/internal/shared/apperror"
 )
 
@@ -22,6 +23,24 @@ type frentistaRequestBody struct {
 	Matricula string `json:"matricula"`
 }
 
+type vincularUsuarioRequestBody struct {
+	UsuarioID int64 `json:"usuario_id"`
+}
+
+// CreateFrentista cadastra um novo frentista.
+// @Summary Cadastrar frentista
+// @Description Cria um novo frentista no sistema.
+// @Tags Frentistas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param frentista body frentistaRequestBody true "Dados do frentista"
+// @Success 201 {object} frentista.Frentista
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /frentistas [post]
 func (h *FrentistaHandler) create(w http.ResponseWriter, r *http.Request) {
 	var body frentistaRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
@@ -42,6 +61,22 @@ func (h *FrentistaHandler) create(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusCreated, f)
 }
 
+// UpdateFrentista atualiza os dados de um frentista existente.
+// @Summary Atualizar frentista
+// @Description Atualiza os dados de um frentista.
+// @Tags Frentistas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do frentista"
+// @Param frentista body frentistaRequestBody true "Dados atualizados do frentista"
+// @Success 200 {object} frentista.Frentista
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /frentistas/{id} [put]
 func (h *FrentistaHandler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -68,6 +103,18 @@ func (h *FrentistaHandler) update(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, f)
 }
 
+// DeleteFrentista remove um frentista do sistema.
+// @Summary Excluir frentista
+// @Description Remove um frentista do sistema.
+// @Tags Frentistas
+// @Security BearerAuth
+// @Param id path int true "ID do frentista"
+// @Success 204 "Frentista excluído com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /frentistas/{id} [delete]
 func (h *FrentistaHandler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -85,6 +132,19 @@ func (h *FrentistaHandler) delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetFrentista retorna os dados de um frentista.
+// @Summary Buscar frentista por ID
+// @Description Retorna os dados completos de um frentista.
+// @Tags Frentistas
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do frentista"
+// @Success 200 {object} frentista.Frentista
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /frentistas/{id} [get]
 func (h *FrentistaHandler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -100,6 +160,18 @@ func (h *FrentistaHandler) get(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, f)
 }
 
+// ListFrentistas lista frentistas com filtros opcionais.
+// @Summary Listar frentistas
+// @Description Lista os frentistas, podendo aplicar filtros.
+// @Tags Frentistas
+// @Produce json
+// @Security BearerAuth
+// @Param ativo query bool false "Filtrar apenas registros ativos"
+// @Success 200 {array} frentista.Frentista
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /frentistas [get]
 func (h *FrentistaHandler) list(w http.ResponseWriter, r *http.Request) {
 	var ativo *bool
 	if raw := r.URL.Query().Get("ativo"); raw != "" {
@@ -124,6 +196,22 @@ func (h *FrentistaHandler) list(w http.ResponseWriter, r *http.Request) {
 	apperror.WriteJSON(w, http.StatusOK, list)
 }
 
+// VincularUsuario vincula um usuário a um frentista.
+// @Summary Vincular usuário a frentista
+// @Description Vincula um usuário a um frentista.
+// @Tags Frentistas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID do frentista"
+// @Param body body vincularUsuarioRequestBody true "ID do usuário a vincular"
+// @Success 204 "Usuário vinculado com sucesso"
+// @Failure 400 {object} apperror.ErrorResponse
+// @Failure 401 {object} apperror.ErrorResponse
+// @Failure 404 {object} apperror.ErrorResponse
+// @Failure 422 {object} apperror.ErrorResponse
+// @Failure 500 {object} apperror.ErrorResponse
+// @Router /frentistas/{id}/usuario [patch]
 func (h *FrentistaHandler) vincularUsuario(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -131,9 +219,7 @@ func (h *FrentistaHandler) vincularUsuario(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var body struct {
-		UsuarioID int64 `json:"usuario_id"`
-	}
+	var body vincularUsuarioRequestBody
 	if err := apperror.DecodeJSON(w, r, &body); err != nil {
 		apperror.WriteError(w, err)
 		return
