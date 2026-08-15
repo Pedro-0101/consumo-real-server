@@ -84,3 +84,14 @@ Internamente a API continua escutando em `8080` e o app acessa o banco em
 | `ADMIN_BASE_NOME` | `Administrador` | Nome do admin base |
 | `ADMIN_BASE_EMAIL` | `admin@consumoreal.com.br` | E-mail do admin base |
 | `ADMIN_BASE_SENHA` | `admin123` | Senha do admin base (armazenada com bcrypt) |
+
+## Documentação (Swagger)
+
+A documentação interativa da API é servida pelas rotas abaixo (públicas, sem
+autenticação):
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/swagger` | Interface Swagger UI |
+| GET | `/swagger/` | Interface Swagger UI (variante com barra) |
+| GET | `/swagger/doc.json` | Spec Swagger 2.0 em JSON |
