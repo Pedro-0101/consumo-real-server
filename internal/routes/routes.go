@@ -181,7 +181,16 @@ const swaggerUITemplate = `<!DOCTYPE html>
         dom_id: "#swagger-ui",
         deepLinking: true,
         presets: [SwaggerUIBundle.presets.apis],
-        layout: "BaseLayout"
+        layout: "BaseLayout",
+        // cola apenas o token no Authorize: o prefixo "Bearer " é adicionado
+        // automaticamente em toda requisição autenticada.
+        requestInterceptor: function (req) {
+          var auth = req.headers["Authorization"];
+          if (auth && auth.indexOf("Bearer ") !== 0) {
+            req.headers["Authorization"] = "Bearer " + auth;
+          }
+          return req;
+        }
       });
     };
   </script>
