@@ -2,6 +2,7 @@ package empresa
 
 import (
 	domainempresa "consumo-real-server/internal/domain/empresa"
+	domainusuario "consumo-real-server/internal/domain/usuario"
 )
 
 // Service agrupa os handlers de empresa e é o ponto de entrada
@@ -14,9 +15,9 @@ type Service struct {
 	List   *ListHandler
 }
 
-func NewService(repo domainempresa.Repository) *Service {
+func NewService(repo domainempresa.Repository, onboarding OnboardingRepository, hasher domainusuario.PasswordHasher) *Service {
 	return &Service{
-		Create: NewCreateHandler(repo),
+		Create: NewCreateHandler(repo, onboarding, hasher),
 		Update: NewUpdateHandler(repo),
 		Delete: NewDeleteHandler(repo),
 		Get:    NewGetHandler(repo),

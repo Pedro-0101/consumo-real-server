@@ -3,8 +3,10 @@ package empresa
 import (
 	"context"
 	"errors"
+	"strings"
 
 	domainempresa "consumo-real-server/internal/domain/empresa"
+	domainusuario "consumo-real-server/internal/domain/usuario"
 	"consumo-real-server/internal/shared"
 	"consumo-real-server/internal/shared/apperror"
 )
@@ -14,14 +16,23 @@ type CreateCommand struct {
 	Nome      string
 	CNPJ      string
 	UsuarioID int64
+	Papel     domainusuario.Papel
+
+	// Dados opcionais do primeiro administrador da empresa. Quando informados,
+	// a empresa e o administrador são criados em uma única transação.
+	AdminNome  string
+	AdminEmail string
+	AdminSenha string
 }
 
 type CreateHandler struct {
-	repo domainempresa.Repository
+	repo       domainempresa.Repository
+	onboarding OnboardingRepository
+	hasher     domainusuario.PasswordHasher
 }
 
-func NewCreateHandler(repo domainempresa.Repository) *CreateHandler {
-	return &CreateHandler{repo: repo}
+func NewCreateHandler(repo domainempresa.Repository, onboarding OnboardingRepository, hasher domainusuario.PasswordHasher) *CreateHandler {
+	return &CreateHandler{repo: repo, onboarding: onboarding, hasher: hasher}
 }
 
 func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) (*domainempresa.Empresa, error) {
@@ -31,8 +42,44 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) (*domaine
 	}
 	e.AuditFields = shared.NewAuditFields(cmd.UsuarioID)
 
-	if err := h.repo.Create(ctx, e); err != nil {
-		return nil, apperror.Internal("falha ao criar empresa", err)
+	if strings.TrimSpace(cmd.AdminNome) == "" &&
+		strings.TrimSpace(cmd.AdminEmail) == "" &&
+		strings.TrimSpace(cmd.AdminSenha) == "" {
+		if err := h.repo.Create(ctx, e); err != nil {
+			return nil, apperror.Internal("falha ao criar empresa", err)
+		}
+		return e, nil
+	}
+
+	if cmd.Papel != domainusuario.PapelAdminBase {
+		return nil, apperror.Unauthorized("somente o administrador base pode criar empresa com administrador inicial")
+	}
+
+	if strings.TrimSpace(cmd.AdminNome) == "" ||
+		strings.TrimSpace(cmd.AdminEmail) == "" ||
+		strings.TrimSpace(cmd.AdminSenha) == "" {
+		return nil, apperror.Validation("dados do administrador inicial incompletos", nil)
+	}
+
+	senhaHash, err := h.hasher.Hash(cmd.AdminSenha)
+	if err != nil {
+		return nil, apperror.Internal("falha ao gerar hash da senha do administrador", err)
+	}
+
+	adminNome := cmd.AdminNome
+	adminEmail := cmd.AdminEmail
+	if err := h.onboarding.CriarEmpresaComAdministrador(ctx, e, func(empresaID int64) (*domainusuario.Usuario, error) {
+		u, err := domainusuario.NewUsuario(adminNome, adminEmail, senhaHash, domainusuario.PapelAdministrador, empresaID)
+		if err != nil {
+			return nil, apperror.FromDomain(err)
+		}
+		u.AuditFields = shared.NewAuditFields(cmd.UsuarioID)
+		return u, nil
+	}); err != nil {
+		if ae, ok := apperror.As(err); ok {
+			return nil, ae
+		}
+		return nil, apperror.Internal("falha ao criar empresa com administrador inicial", err)
 	}
 	return e, nil
 }

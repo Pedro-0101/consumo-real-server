@@ -49,6 +49,15 @@ func currentUserID(r *http.Request) int64 {
 	return claims.UsuarioID
 }
 
+// currentUserPapel retorna o papel do usuário autenticado, ou vazio se não autenticado.
+func currentUserPapel(r *http.Request) string {
+	claims, ok := auth.ClaimsFromContext(r.Context())
+	if !ok {
+		return ""
+	}
+	return claims.Papel
+}
+
 // parseQueryInt64 retorna o valor do parâmetro de consulta como int64, ou 0.
 func parseQueryInt64(r *http.Request, key string) int64 {
 	raw := r.URL.Query().Get(key)

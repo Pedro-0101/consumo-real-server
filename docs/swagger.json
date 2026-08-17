@@ -1289,7 +1289,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Cria uma nova empresa no sistema.",
+                "description": "Cria uma nova empresa (tenant multitenant). Dois fluxos possíveis:\n\n1) Apenas empresa: informe somente nome e cnpj. Disponível para qualquer usuário autenticado.\n2) Empresa com o primeiro administrador: informe também nome_administrador,\nemail_administrador e senha_administrador. A empresa e o administrador\n(papel ADMINISTRADOR) são criados em uma única transação atômica —\nse qualquer validação falhar, nada é persistido. Restrito ao papel ADMIN_BASE,\npois é a forma de \"onboarding\" de um novo tenant sem usuários pré-existentes.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1302,7 +1302,7 @@
                 "summary": "Cadastrar Empresa",
                 "parameters": [
                     {
-                        "description": "Dados da empresa",
+                        "description": "Dados da empresa (e, opcionalmente, do administrador inicial)",
                         "name": "empresa",
                         "in": "body",
                         "required": true,
@@ -5973,7 +5973,17 @@
                 "cnpj": {
                     "type": "string"
                 },
+                "email_administrador": {
+                    "type": "string"
+                },
                 "nome": {
+                    "type": "string"
+                },
+                "nome_administrador": {
+                    "description": "Campos opcionais do primeiro administrador da empresa.\nInformados juntos, criam a empresa e o administrador em uma única\ntransação atômica (fluxo restrito ao papel ADMIN_BASE).",
+                    "type": "string"
+                },
+                "senha_administrador": {
                     "type": "string"
                 }
             }

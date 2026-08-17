@@ -85,6 +85,54 @@ Internamente a API continua escutando em `8080` e o app acessa o banco em
 | `ADMIN_BASE_EMAIL` | `admin@consumoreal.com.br` | E-mail do admin base |
 | `ADMIN_BASE_SENHA` | `admin123` | Senha do admin base (armazenada com bcrypt) |
 
+## Criação de empresas (multitenant)
+
+O sistema é multitenant: cada empresa é um tenant e todo usuário (exceto o
+`ADMIN_BASE`) pertence a uma empresa. Isso cria um ciclo no onboarding: para
+criar uma empresa seria preciso já existir um usuário, e usuário exige empresa.
+Para resolver, `POST /api/empresas` suporta dois fluxos:
+
+### 1) Apenas a empresa (qualquer usuário autenticado)
+
+Cria somente o registro da empresa. Útil para administradores de um tenant já
+existente abrirem outra empresa.
+
+```bash
+curl -X POST http://localhost:8080/api/empresas \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Posto Teste","cnpj":"00.000.000/0001-00"}'
+```
+
+### 2) Empresa + primeiro administrador (somente `ADMIN_BASE`)
+
+O fluxo recomendado para "onboarding" de um novo tenant: em **uma única
+transação atômica** são criados a empresa e o usuário administrador inicial
+(papel `ADMINISTRADOR`). Se qualquer campo for inválido, nada é persistido.
+
+```bash
+curl -X POST http://localhost:8080/api/empresas \
+  -H "Authorization: Bearer <token-do-admin-base>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Posto Teste",
+    "cnpj": "00.000.000/0001-00",
+    "nome_administrador": "João da Silva",
+    "email_administrador": "joao@posto.com",
+    "senha_administrador": "senha123"
+  }'
+```
+
+O usuário criado já consegue fazer login em `POST /api/auth/login` com o
+e-mail/senha informados.
+
+> **Notas**
+> - Os três campos do administrador devem ser informados juntos; informar
+>   apenas alguns retorna erro de validação.
+> - Somente o papel `ADMIN_BASE` pode usar o fluxo 2; outro papel autenticado
+>   recebe `401`.
+> - O `ADMIN_BASE` é criado automaticamente no boot (ver variáveis acima).
+
 ## Documentação (Swagger)
 
 A documentação interativa da API é servida pelas rotas abaixo (públicas, sem

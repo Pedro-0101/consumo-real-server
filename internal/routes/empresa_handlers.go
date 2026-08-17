@@ -6,6 +6,7 @@ import (
 
 	empresaapp "consumo-real-server/internal/application/empresa"
 	_ "consumo-real-server/internal/domain/empresa"
+	domainusuario "consumo-real-server/internal/domain/usuario"
 	"consumo-real-server/internal/shared/apperror"
 )
 
@@ -20,16 +21,30 @@ func NewEmpresaHandler(service *empresaapp.Service) *EmpresaHandler {
 type empresaRequestBody struct {
 	Nome string `json:"nome"`
 	CNPJ string `json:"cnpj"`
+
+	// Campos opcionais do primeiro administrador da empresa.
+	// Informados juntos, criam a empresa e o administrador em uma única
+	// transação atômica (fluxo restrito ao papel ADMIN_BASE).
+	NomeAdministrador  string `json:"nome_administrador"`
+	EmailAdministrador string `json:"email_administrador"`
+	SenhaAdministrador string `json:"senha_administrador"`
 }
 
 // CreateEmpresa cadastra uma nova empresa.
 // @Summary Cadastrar Empresa
-// @Description Cria uma nova empresa no sistema.
+// @Description Cria uma nova empresa (tenant multitenant). Dois fluxos possíveis:
+// @Description
+// @Description 1) Apenas empresa: informe somente nome e cnpj. Disponível para qualquer usuário autenticado.
+// @Description 2) Empresa com o primeiro administrador: informe também nome_administrador,
+// @Description    email_administrador e senha_administrador. A empresa e o administrador
+// @Description    (papel ADMINISTRADOR) são criados em uma única transação atômica —
+// @Description    se qualquer validação falhar, nada é persistido. Restrito ao papel ADMIN_BASE,
+// @Description    pois é a forma de "onboarding" de um novo tenant sem usuários pré-existentes.
 // @Tags Empresas
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param empresa body empresaRequestBody true "Dados da empresa"
+// @Param empresa body empresaRequestBody true "Dados da empresa (e, opcionalmente, do administrador inicial)"
 // @Success 201 {object} empresa.Empresa
 // @Failure 400 {object} apperror.ErrorResponse
 // @Failure 401 {object} apperror.ErrorResponse
@@ -44,9 +59,13 @@ func (h *EmpresaHandler) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	e, err := h.service.Create.Handle(r.Context(), empresaapp.CreateCommand{
-		Nome:      body.Nome,
-		CNPJ:      body.CNPJ,
-		UsuarioID: currentUserID(r),
+		Nome:       body.Nome,
+		CNPJ:       body.CNPJ,
+		UsuarioID:  currentUserID(r),
+		Papel:      domainusuario.Papel(currentUserPapel(r)),
+		AdminNome:  body.NomeAdministrador,
+		AdminEmail: body.EmailAdministrador,
+		AdminSenha: body.SenhaAdministrador,
 	})
 	if err != nil {
 		apperror.WriteError(w, err)

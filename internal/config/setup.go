@@ -104,7 +104,8 @@ func Run() error {
 	usuarioService := usuario.NewService(usuarioRepo, hasher, tokens)
 
 	empresaRepo := database.NewEmpresaGORMRepository(db)
-	empresaService := empresa.NewService(empresaRepo)
+	empresaOnboarding := database.NewEmpresaOnboardingGORMRepository(db)
+	empresaService := empresa.NewService(empresaRepo, empresaOnboarding, hasher)
 
 	unidadeRepo := database.NewUnidadeAdministrativaGORMRepository(db)
 	unidadeService := unidadeadministrativa.NewService(unidadeRepo)
