@@ -22,12 +22,12 @@ var (
 )
 
 type UnidadeAdministrativa struct {
-	ID                      int64  `gorm:"primaryKey"`
-	EmpresaID               int64  `gorm:"not null;index"`
-	UnidadeAdministrativaID int64  `gorm:"index"`
-	Nome                    string `gorm:"size:255;not null"`
-	Tipo                    Tipo   `gorm:"type:varchar(20);not null"`
-	Ativo                   bool   `gorm:"not null;default:true"`
+	ID                      int64  `gorm:"primaryKey" json:"id"`
+	EmpresaID               int64  `gorm:"not null;index" json:"empresaID"`
+	UnidadeAdministrativaID int64  `gorm:"index" json:"unidadeAdministrativaID"`
+	Nome                    string `gorm:"size:255;not null" json:"nome"`
+	Tipo                    Tipo   `gorm:"type:varchar(20);not null" json:"tipo"`
+	Ativo                   bool   `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields      `gorm:"embedded;embeddedPrefix:"`
 }
 

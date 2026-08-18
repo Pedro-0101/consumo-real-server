@@ -18,22 +18,22 @@ var (
 )
 
 type Bico struct {
-	ID      int64  `gorm:"primaryKey"`
-	BombaID int64  `gorm:"not null;index"`
-	Nome    string `gorm:"size:100;not null"`
-	Ativo   bool   `gorm:"not null;default:true"`
+	ID      int64  `gorm:"primaryKey" json:"id"`
+	BombaID int64  `gorm:"not null;index" json:"bombaID"`
+	Nome    string `gorm:"size:100;not null" json:"nome"`
+	Ativo   bool   `gorm:"not null;default:true" json:"ativo"`
 }
 
 type Bomba struct {
-	ID                 int64  `gorm:"primaryKey"`
-	EmpresaID          int64  `gorm:"not null;index"`
-	LocalID            int64  `gorm:"index"`
-	Movel              bool   `gorm:"not null;default:false"`
-	Nome               string `gorm:"size:255;not null"`
-	Descricao          string `gorm:"type:text"`
-	ReservatorioID     int64  `gorm:"not null;index"`
-	Bicos              []Bico `gorm:"foreignKey:BombaID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Ativo              bool   `gorm:"not null;default:true"`
+	ID                 int64  `gorm:"primaryKey" json:"id"`
+	EmpresaID          int64  `gorm:"not null;index" json:"empresaID"`
+	LocalID            int64  `gorm:"index" json:"localID"`
+	Movel              bool   `gorm:"not null;default:false" json:"movel"`
+	Nome               string `gorm:"size:255;not null" json:"nome"`
+	Descricao          string `gorm:"type:text" json:"descricao"`
+	ReservatorioID     int64  `gorm:"not null;index" json:"reservatorioID"`
+	Bicos              []Bico `gorm:"foreignKey:BombaID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"bicos"`
+	Ativo              bool   `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 

@@ -28,15 +28,15 @@ var (
 )
 
 type OrdemAbastecimento struct {
-	ID                   int64      `gorm:"primaryKey"`
-	EmpresaID            int64      `gorm:"not null;index"`
-	Numero               string     `gorm:"size:50;not null;uniqueIndex"`
-	PatrimonioID         int64      `gorm:"not null;index"`
-	QuantidadeAutorizada float64    `gorm:"not null"`
-	QuantidadeAbastecida float64    `gorm:"not null;default:0"`
-	Status               Status     `gorm:"type:varchar(20);not null;index"`
-	DataEmissao          time.Time  `gorm:"not null"`
-	DataValidade         *time.Time `gorm:"index"`
+	ID                   int64      `gorm:"primaryKey" json:"id"`
+	EmpresaID            int64      `gorm:"not null;index" json:"empresaID"`
+	Numero               string     `gorm:"size:50;not null;uniqueIndex" json:"numero"`
+	PatrimonioID         int64      `gorm:"not null;index" json:"patrimonioID"`
+	QuantidadeAutorizada float64    `gorm:"not null" json:"quantidadeAutorizada"`
+	QuantidadeAbastecida float64    `gorm:"not null;default:0" json:"quantidadeAbastecida"`
+	Status               Status     `gorm:"type:varchar(20);not null;index" json:"status"`
+	DataEmissao          time.Time  `gorm:"not null" json:"dataEmissao"`
+	DataValidade         *time.Time `gorm:"index" json:"dataValidade"`
 	shared.AuditFields   `gorm:"embedded;embeddedPrefix:"`
 }
 

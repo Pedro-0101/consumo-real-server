@@ -31,15 +31,15 @@ var (
 )
 
 type Combustivel struct {
-	ID                 int64   `gorm:"primaryKey"`
-	EmpresaID          int64   `gorm:"not null;index"`
-	Nome               string  `gorm:"size:255;not null"`
-	Tipo               Tipo    `gorm:"type:varchar(30);not null"`
-	Unidade            Unidade `gorm:"type:varchar(20);not null"`
-	Densidade          float64 `gorm:"not null"`
-	PrecoCusto         float64 `gorm:"not null;default:0"`
-	PrecoVenda         float64 `gorm:"not null;default:0"`
-	Ativo              bool    `gorm:"not null;default:true"`
+	ID                 int64   `gorm:"primaryKey" json:"id"`
+	EmpresaID          int64   `gorm:"not null;index" json:"empresaID"`
+	Nome               string  `gorm:"size:255;not null" json:"nome"`
+	Tipo               Tipo    `gorm:"type:varchar(30);not null" json:"tipo"`
+	Unidade            Unidade `gorm:"type:varchar(20);not null" json:"unidade"`
+	Densidade          float64 `gorm:"not null" json:"densidade"`
+	PrecoCusto         float64 `gorm:"not null;default:0" json:"precoCusto"`
+	PrecoVenda         float64 `gorm:"not null;default:0" json:"precoVenda"`
+	Ativo              bool    `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 

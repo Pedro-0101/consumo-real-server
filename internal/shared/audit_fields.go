@@ -14,10 +14,10 @@ Eles incluem a data e hora de criação e atualização, bem como o ID do usuár
 */
 
 type AuditFields struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	CreatedBy int64
-	UpdatedBy int64
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedBy int64     `json:"createdBy"`
+	UpdatedBy int64     `json:"updatedBy"`
 }
 
 func NewAuditFields(createdBy int64) AuditFields {

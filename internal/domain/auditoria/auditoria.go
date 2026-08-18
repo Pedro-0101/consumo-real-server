@@ -22,14 +22,14 @@ var (
 // Auditoria registra uma movimentação (criação, atualização ou exclusão) de
 // um registro de qualquer entidade do sistema, com snapshot antes/depois.
 type Auditoria struct {
-	ID           int64            `gorm:"primaryKey"`
-	EmpresaID    int64            `gorm:"not null;index"`
-	Entidade     string           `gorm:"size:100;not null;index"`
-	EntidadeID   int64            `gorm:"not null;index"`
-	Operacao     Operacao         `gorm:"type:varchar(10);not null"`
-	DadosAntigos json.RawMessage  `gorm:"type:jsonb"`
-	DadosNovos   json.RawMessage  `gorm:"type:jsonb"`
-	UsuarioID    int64            `gorm:"not null;index"`
+	ID           int64            `gorm:"primaryKey" json:"id"`
+	EmpresaID    int64            `gorm:"not null;index" json:"empresaID"`
+	Entidade     string           `gorm:"size:100;not null;index" json:"entidade"`
+	EntidadeID   int64            `gorm:"not null;index" json:"entidadeID"`
+	Operacao     Operacao         `gorm:"type:varchar(10);not null" json:"operacao"`
+	DadosAntigos json.RawMessage  `gorm:"type:jsonb" json:"dadosAntigos"`
+	DadosNovos   json.RawMessage  `gorm:"type:jsonb" json:"dadosNovos"`
+	UsuarioID    int64            `gorm:"not null;index" json:"usuarioID"`
 	shared.AuditFields            `gorm:"embedded;embeddedPrefix:"`
 }
 

@@ -23,15 +23,15 @@ var (
 )
 
 type Reservatorio struct {
-	ID                 int64                   `gorm:"primaryKey"`
-	EmpresaID          int64                   `gorm:"not null;index"`
-	Nome               string                  `gorm:"size:255;not null"`
-	Capacidade         float64                 `gorm:"not null"`
-	NivelAtual         float64                 `gorm:"not null;default:0"`
-	NivelMinimo        float64                 `gorm:"not null;default:0"`
-	CombustivelID      int64                   `gorm:"not null;index"`
-	Combustivel        combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Ativo              bool                    `gorm:"not null;default:true"`
+	ID                 int64                   `gorm:"primaryKey" json:"id"`
+	EmpresaID          int64                   `gorm:"not null;index" json:"empresaID"`
+	Nome               string                  `gorm:"size:255;not null" json:"nome"`
+	Capacidade         float64                 `gorm:"not null" json:"capacidade"`
+	NivelAtual         float64                 `gorm:"not null;default:0" json:"nivelAtual"`
+	NivelMinimo        float64                 `gorm:"not null;default:0" json:"nivelMinimo"`
+	CombustivelID      int64                   `gorm:"not null;index" json:"combustivelID"`
+	Combustivel        combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;" json:"combustivel"`
+	Ativo              bool                    `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 

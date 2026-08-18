@@ -14,12 +14,12 @@ var (
 )
 
 type Local struct {
-	ID                      int64  `gorm:"primaryKey"`
-	EmpresaID               int64  `gorm:"not null;index"`
-	UnidadeAdministrativaID int64  `gorm:"not null;index"`
-	Nome                    string `gorm:"size:255;not null"`
-	Descricao               string `gorm:"type:text"`
-	Ativo                   bool   `gorm:"not null;default:true"`
+	ID                      int64  `gorm:"primaryKey" json:"id"`
+	EmpresaID               int64  `gorm:"not null;index" json:"empresaID"`
+	UnidadeAdministrativaID int64  `gorm:"not null;index" json:"unidadeAdministrativaID"`
+	Nome                    string `gorm:"size:255;not null" json:"nome"`
+	Descricao               string `gorm:"type:text" json:"descricao"`
+	Ativo                   bool   `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields      `gorm:"embedded;embeddedPrefix:"`
 }
 

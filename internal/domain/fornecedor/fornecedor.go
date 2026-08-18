@@ -13,11 +13,11 @@ var (
 )
 
 type Fornecedor struct {
-	ID                 int64  `gorm:"primaryKey"`
-	EmpresaID          int64  `gorm:"not null;index"`
-	Nome               string `gorm:"size:255;not null"`
-	CNPJ               string `gorm:"size:20;index"`
-	Ativo              bool   `gorm:"not null;default:true"`
+	ID                 int64  `gorm:"primaryKey" json:"id"`
+	EmpresaID          int64  `gorm:"not null;index" json:"empresaID"`
+	Nome               string `gorm:"size:255;not null" json:"nome"`
+	CNPJ               string `gorm:"size:20;index" json:"cnpj"`
+	Ativo              bool   `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 

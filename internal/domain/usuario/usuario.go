@@ -24,13 +24,13 @@ var (
 )
 
 type Usuario struct {
-	ID                 int64  `gorm:"primaryKey"`
-	EmpresaID          int64  `gorm:"index"`
-	Nome               string `gorm:"size:255;not null"`
-	Email              string `gorm:"size:255;not null;uniqueIndex"`
+	ID                 int64  `gorm:"primaryKey" json:"id"`
+	EmpresaID          int64  `gorm:"index" json:"empresaID"`
+	Nome               string `gorm:"size:255;not null" json:"nome"`
+	Email              string `gorm:"size:255;not null;uniqueIndex" json:"email"`
 	SenhaHash          string `gorm:"size:255;not null" json:"-"`
-	Papel              Papel  `gorm:"type:varchar(20);not null;index"`
-	Ativo              bool   `gorm:"not null;default:true"`
+	Papel              Papel  `gorm:"type:varchar(20);not null;index" json:"papel"`
+	Ativo              bool   `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 

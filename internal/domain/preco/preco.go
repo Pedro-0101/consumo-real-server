@@ -15,14 +15,14 @@ var (
 )
 
 type Preco struct {
-	ID                 int64      `gorm:"primaryKey"`
-	EmpresaID          int64      `gorm:"not null;index"`
-	CombustivelID      int64      `gorm:"not null;index"`
-	PrecoCusto         float64    `gorm:"not null"`
-	PrecoVenda         float64    `gorm:"not null"`
-	VigenciaInicio     time.Time  `gorm:"not null"`
-	VigenciaFim        *time.Time `gorm:"index"`
-	Ativo              bool       `gorm:"not null;default:true"`
+	ID                 int64      `gorm:"primaryKey" json:"id"`
+	EmpresaID          int64      `gorm:"not null;index" json:"empresaID"`
+	CombustivelID      int64      `gorm:"not null;index" json:"combustivelID"`
+	PrecoCusto         float64    `gorm:"not null" json:"precoCusto"`
+	PrecoVenda         float64    `gorm:"not null" json:"precoVenda"`
+	VigenciaInicio     time.Time  `gorm:"not null" json:"vigenciaInicio"`
+	VigenciaFim        *time.Time `gorm:"index" json:"vigenciaFim"`
+	Ativo              bool       `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 

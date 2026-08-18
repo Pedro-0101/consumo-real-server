@@ -14,10 +14,10 @@ var (
 )
 
 type Empresa struct {
-	ID                 int64  `gorm:"primaryKey"`
-	Nome               string `gorm:"size:255;not null"`
-	CNPJ               string `gorm:"size:20;not null;uniqueIndex"`
-	Ativo              bool   `gorm:"not null;default:true"`
+	ID                 int64  `gorm:"primaryKey" json:"id"`
+	Nome               string `gorm:"size:255;not null" json:"nome"`
+	CNPJ               string `gorm:"size:20;not null;uniqueIndex" json:"cnpj"`
+	Ativo              bool   `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 

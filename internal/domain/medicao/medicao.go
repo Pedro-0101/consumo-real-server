@@ -17,13 +17,13 @@ var (
 )
 
 type Medicao struct {
-	ID                 int64     `gorm:"primaryKey"`
-	EmpresaID          int64     `gorm:"not null;index"`
-	ReservatorioID     int64     `gorm:"not null;index"`
-	NivelCalculado     float64   `gorm:"not null"`
-	NivelMedido        float64   `gorm:"not null"`
-	Diferenca          float64   `gorm:"not null"`
-	Data               time.Time `gorm:"not null;index"`
+	ID                 int64     `gorm:"primaryKey" json:"id"`
+	EmpresaID          int64     `gorm:"not null;index" json:"empresaID"`
+	ReservatorioID     int64     `gorm:"not null;index" json:"reservatorioID"`
+	NivelCalculado     float64   `gorm:"not null" json:"nivelCalculado"`
+	NivelMedido        float64   `gorm:"not null" json:"nivelMedido"`
+	Diferenca          float64   `gorm:"not null" json:"diferenca"`
+	Data               time.Time `gorm:"not null;index" json:"data"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
 

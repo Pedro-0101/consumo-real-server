@@ -29,16 +29,16 @@ var (
 )
 
 type Patrimonio struct {
-	ID                      int64             `gorm:"primaryKey"`
-	EmpresaID               int64             `gorm:"not null;index"`
-	UnidadeAdministrativaID int64             `gorm:"index"`
-	Nome                    string            `gorm:"size:255;not null"`
-	Descricao               string            `gorm:"type:text"`
-	Tipo                    string            `gorm:"type:varchar(30);not null;index"`
-	TipoMedicao             TipoMedicao       `gorm:"type:varchar(20);not null"`
-	CodigoExterno           string            `gorm:"size:100;index"`
-	Atributos               map[string]string `gorm:"type:jsonb;serializer:json"`
-	Ativo                   bool              `gorm:"not null;default:true"`
+	ID                      int64             `gorm:"primaryKey" json:"id"`
+	EmpresaID               int64             `gorm:"not null;index" json:"empresaID"`
+	UnidadeAdministrativaID int64             `gorm:"index" json:"unidadeAdministrativaID"`
+	Nome                    string            `gorm:"size:255;not null" json:"nome"`
+	Descricao               string            `gorm:"type:text" json:"descricao"`
+	Tipo                    string            `gorm:"type:varchar(30);not null;index" json:"tipo"`
+	TipoMedicao             TipoMedicao       `gorm:"type:varchar(20);not null" json:"tipoMedicao"`
+	CodigoExterno           string            `gorm:"size:100;index" json:"codigoExterno"`
+	Atributos               map[string]string `gorm:"type:jsonb;serializer:json" json:"atributos"`
+	Ativo                   bool              `gorm:"not null;default:true" json:"ativo"`
 	shared.AuditFields      `gorm:"embedded;embeddedPrefix:"`
 }
 
