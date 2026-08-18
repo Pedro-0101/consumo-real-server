@@ -16,7 +16,7 @@ import (
 
 // tabelaAuditoria é a tabela da própria auditoria, que fica fora do escopo
 // dos callbacks para evitar recursão.
-const tabelaAuditoria = "auditorias"
+const tabelaAuditoria = "auditoria"
 
 // chave usada para transportar o snapshot "antes" entre os callbacks
 // Before/After de uma mesma operação.
@@ -130,8 +130,12 @@ func gravarAuditoria(tx *gorm.DB, operacao domainauditoria.Operacao, antes, novo
 		return
 	}
 
+	// Usa uma sessão com statement novo (NewDB) e chama Create diretamente
+	// (sem WithContext): assim o GORM monta o INSERT da auditoria do zero.
+	// Caso contrário, o statement herdado manteria o SQL já montado do
+	// statement pai e reexecutaria o INSERT da entidade original em loop.
 	auditoriaTx := tx.Session(&gorm.Session{NewDB: true})
-	if err := NewAuditoriaGORMRepository(auditoriaTx).Create(stmt.Context, a); err != nil {
+	if err := auditoriaTx.Create(a).Error; err != nil {
 		tx.AddError(err)
 	}
 }
