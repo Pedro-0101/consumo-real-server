@@ -16,6 +16,7 @@ import (
 	"gorm.io/gorm"
 
 	"consumo-real-server/internal/application/abastecimento"
+	"consumo-real-server/internal/application/auditoria"
 	"consumo-real-server/internal/application/bomba"
 	combustivelapp "consumo-real-server/internal/application/combustivel"
 	"consumo-real-server/internal/application/empresa"
@@ -88,6 +89,11 @@ func Run() error {
 	}
 	log.Info("migracoes aplicadas com sucesso", "fase", "database")
 
+	if err := database.RegistrarAuditoria(db); err != nil {
+		return fmt.Errorf("falha ao registrar callbacks de auditoria: %w", err)
+	}
+	log.Info("callbacks de auditoria registrados", "fase", "database")
+
 	if err := seedAdminBase(db, cfg, log); err != nil {
 		return fmt.Errorf("falha ao executar os seeds: %w", err)
 	}
@@ -143,6 +149,9 @@ func Run() error {
 	abastecimentoRepo := database.NewAbastecimentoGORMRepository(db)
 	abastecimentoService := abastecimento.NewService(abastecimentoRepo, bombaRepo, reservatorioRepo)
 
+	auditoriaRepo := database.NewAuditoriaGORMRepository(db)
+	auditoriaService := auditoria.NewService(auditoriaRepo)
+
 	r := routes.NewRoutes(routes.Handlers{
 		Combustivel:   combustivelHandler,
 		Usuario:       routes.NewUsuarioHandler(usuarioService),
@@ -160,6 +169,7 @@ func Run() error {
 		Medicao:       routes.NewMedicaoHandler(medicaoService),
 		Entrada:       routes.NewEntradaHandler(entradaService),
 		Abastecimento: routes.NewAbastecimentoHandler(abastecimentoService),
+		Auditoria:     routes.NewAuditoriaHandler(auditoriaService),
 	}, tokens)
 
 	server := &http.Server{

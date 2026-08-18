@@ -408,6 +408,108 @@
                 }
             }
         },
+        "/auditorias": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista as movimentações registradas no sistema. Usuários com empresa veem\napenas a própria empresa; usuários sem empresa (ADMIN_BASE) acessam todas\ne devem informar o parâmetro empresa_id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auditoria"
+                ],
+                "summary": "Listar auditorias",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da empresa (obrigatório para ADMIN_BASE)",
+                        "name": "empresa_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Nome da entidade (ex.: empresas, usuarios)",
+                        "name": "entidade",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tipo de operação (CREATE, UPDATE, DELETE)",
+                        "name": "operacao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do usuário responsável",
+                        "name": "usuario_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Início do período (RFC3339, ex.: 2026-08-01T00:00:00-03:00)",
+                        "name": "de",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fim do período (RFC3339, ex.: 2026-08-18T23:59:59-03:00)",
+                        "name": "ate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limite de registros por página (padrão 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Deslocamento para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/consumo-real-server_internal_domain_auditoria.Auditoria"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/consumo-real-server_internal_shared_apperror.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/consumo-real-server_internal_shared_apperror.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/consumo-real-server_internal_shared_apperror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/consumo-real-server_internal_shared_apperror.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Autentica o usuário com e-mail e senha, retornando um token JWT de acesso.",
@@ -5138,6 +5240,68 @@
             "x-enum-varnames": [
                 "TipoAbastecimento",
                 "TipoTransferencia"
+            ]
+        },
+        "consumo-real-server_internal_domain_auditoria.Auditoria": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "createdBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "dadosAntigos": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "dadosNovos": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "empresaID": {
+                    "type": "integer"
+                },
+                "entidade": {
+                    "type": "string"
+                },
+                "entidadeID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "operacao": {
+                    "$ref": "#/definitions/consumo-real-server_internal_domain_auditoria.Operacao"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "updatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "usuarioID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "consumo-real-server_internal_domain_auditoria.Operacao": {
+            "type": "string",
+            "enum": [
+                "CREATE",
+                "UPDATE",
+                "DELETE"
+            ],
+            "x-enum-varnames": [
+                "OperacaoCreate",
+                "OperacaoUpdate",
+                "OperacaoDelete"
             ]
         },
         "consumo-real-server_internal_domain_bomba.Bico": {

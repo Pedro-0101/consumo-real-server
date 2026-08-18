@@ -11,6 +11,7 @@ import (
 	gormlogger "gorm.io/gorm/logger"
 
 	"consumo-real-server/internal/domain/abastecimento"
+	"consumo-real-server/internal/domain/auditoria"
 	"consumo-real-server/internal/domain/bomba"
 	"consumo-real-server/internal/domain/combustivel"
 	"consumo-real-server/internal/domain/empresa"
@@ -71,6 +72,7 @@ func AutoMigrate(db *gorm.DB) error {
 		&entrada.Entrada{},
 		&medicao.Medicao{},
 		&abastecimento.Abastecimento{},
+		&auditoria.Auditoria{},
 	)
 }
 

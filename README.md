@@ -133,6 +133,43 @@ e-mail/senha informados.
 >   recebe `401`.
 > - O `ADMIN_BASE` é criado automaticamente no boot (ver variáveis acima).
 
+## Auditoria
+
+O sistema registra automaticamente toda **criação, atualização e exclusão**
+(`CREATE`, `UPDATE`, `DELETE`) de registros das entidades na tabela
+`auditorias`, dentro da **mesma transação** da operação. Cada registro contém:
+
+- **empresa_id** — empresa afetada (tenant dono da movimentação);
+- **entidade** / **entidade_id** — tabela e ID do registro movimentado;
+- **operacao** — `CREATE`, `UPDATE` ou `DELETE`;
+- **dados_antigos** / **dados_novos** — snapshot JSON antes e depois (campos
+  sensíveis como senha/hash/token são omitidos);
+- **usuario_id** — usuário responsável (extraído do token JWT; operações
+  internas, como seeds, ficam com `0`);
+- timestamps de auditoria.
+
+### Consultar movimentações
+
+`GET /api/auditorias` — filtros opcionais:
+
+| Parâmetro | Descrição |
+| --- | --- |
+| `empresa_id` | ID da empresa (**obrigatório** para usuários sem empresa, ex.: `ADMIN_BASE`) |
+| `entidade` | Nome da entidade (ex.: `empresas`, `usuarios`) |
+| `operacao` | Tipo de operação (`CREATE`, `UPDATE`, `DELETE`) |
+| `usuario_id` | ID do usuário responsável |
+| `de` / `ate` | Período (RFC3339 ou data `2006-01-02`) |
+| `limit` / `offset` | Paginação (padrão `limit=100`) |
+
+**Regra de acesso:** usuários vinculados a uma empresa veem somente as
+movimentações da própria empresa; o `ADMIN_BASE` (empresa id `0`) acessa todas
+e deve informar `empresa_id`.
+
+```bash
+curl "http://localhost:8080/api/auditorias?empresa_id=1&operacao=CREATE&limit=50" \
+  -H "Authorization: Bearer <token>"
+```
+
 ## Documentação (Swagger)
 
 A documentação interativa da API é servida pelas rotas abaixo (públicas, sem

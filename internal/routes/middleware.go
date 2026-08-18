@@ -55,6 +55,16 @@ func currentUserID(r *http.Request) int64 {
 	return claims.UsuarioID
 }
 
+// currentUserEmpresaID retorna o ID da empresa do usuário autenticado.
+// Usuários sem empresa (ex.: ADMIN_BASE) retornam 0.
+func currentUserEmpresaID(r *http.Request) int64 {
+	claims, ok := auth.ClaimsFromContext(r.Context())
+	if !ok {
+		return 0
+	}
+	return claims.EmpresaID
+}
+
 // currentUserPapel retorna o papel do usuário autenticado, ou vazio se não autenticado.
 func currentUserPapel(r *http.Request) string {
 	claims, ok := auth.ClaimsFromContext(r.Context())
