@@ -30,14 +30,20 @@ func middlewareAutenticacao(tokens auth.TokenManager) func(http.Handler) http.Ha
 	}
 }
 
-// bearerToken extrai o token do header Authorization (formato "Bearer <token>").
+// bearerToken extrai o token do header Authorization.
+//
+// O contrato da API é enviar apenas o token JWT cru (o prefixo "Bearer " é
+// adicionado pelo próprio back-end), mas o formato "Bearer <token>" também é
+// aceito por compatibilidade (Swagger UI).
 func bearerToken(r *http.Request) (string, bool) {
-	header := r.Header.Get("Authorization")
-	parts := strings.Fields(header)
-	if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
+	header := strings.TrimSpace(r.Header.Get("Authorization"))
+	if header == "" {
 		return "", false
 	}
-	return parts[1], true
+	if parts := strings.Fields(header); len(parts) == 2 && strings.EqualFold(parts[0], "Bearer") {
+		return parts[1], true
+	}
+	return header, true
 }
 
 // currentUserID retorna o ID do usuário autenticado, ou 0 se não autenticado.

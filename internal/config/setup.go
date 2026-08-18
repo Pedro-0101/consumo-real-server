@@ -164,7 +164,7 @@ func Run() error {
 
 	server := &http.Server{
 		Addr:    ":" + cfg.ServerPort,
-		Handler: r,
+		Handler: routes.MiddlewareCORS(r),
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
