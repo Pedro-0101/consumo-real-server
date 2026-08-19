@@ -232,9 +232,15 @@ func (h *UsuarioHandler) list(w http.ResponseWriter, r *http.Request) {
 		ativo = &parsed
 	}
 
+	empresaID := currentUserEmpresaID(r)
+	if empresaID <= 0 {
+		empresaID = parseQueryInt64(r, "empresa_id")
+	}
+
 	list, err := h.service.List.Handle(r.Context(), usuarioapp.ListQuery{
-		Papel: domainusuario.Papel(r.URL.Query().Get("papel")),
-		Ativo: ativo,
+		EmpresaID: empresaID,
+		Papel:     domainusuario.Papel(r.URL.Query().Get("papel")),
+		Ativo:     ativo,
 	})
 	if err != nil {
 		apperror.WriteError(w, err)
