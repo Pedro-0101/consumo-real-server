@@ -49,7 +49,7 @@ func (h *PatrimonioHandler) create(w http.ResponseWriter, r *http.Request) {
 	p, err := h.service.Create.Handle(r.Context(), patrimonioapp.CreateCommand{
 		EmpresaID:     body.EmpresaID,
 		Nome:          body.Nome,
-		Tipo:          body.Tipo,
+		Tipo:          domainpatrimonio.Tipo(body.Tipo),
 		CodigoExterno: body.CodigoExterno,
 		TipoMedicao:   domainpatrimonio.TipoMedicao(body.TipoMedicao),
 		UsuarioID:     currentUserID(r),
@@ -93,7 +93,7 @@ func (h *PatrimonioHandler) update(w http.ResponseWriter, r *http.Request) {
 	p, err := h.service.Update.Handle(r.Context(), patrimonioapp.UpdateCommand{
 		ID:            id,
 		Nome:          body.Nome,
-		Tipo:          body.Tipo,
+		Tipo:          domainpatrimonio.Tipo(body.Tipo),
 		CodigoExterno: body.CodigoExterno,
 		TipoMedicao:   domainpatrimonio.TipoMedicao(body.TipoMedicao),
 		UsuarioID:     currentUserID(r),

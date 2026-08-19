@@ -78,7 +78,7 @@ func (h *UpdateHandler) Handle(ctx context.Context, cmd UpdateCommand) (*domaine
 		return nil, apperror.Internal("falha ao buscar entrada", err)
 	}
 
-	e.NotaFiscal = cmd.NotaFiscal
+	e.AtualizarNotaFiscal(cmd.NotaFiscal)
 	e.AuditFields.Update(cmd.UsuarioID)
 
 	if err := h.repo.Update(ctx, e); err != nil {

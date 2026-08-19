@@ -15,7 +15,7 @@ var (
 type Frentista struct {
 	ID                 int64  `gorm:"primaryKey" json:"id"`
 	EmpresaID          int64  `gorm:"not null;index" json:"empresaID"`
-	UsuarioID          int64  `gorm:"index" json:"usuarioID"`
+	UsuarioID          *int64 `gorm:"uniqueIndex" json:"usuarioID"`
 	Nome               string `gorm:"size:255;not null" json:"nome"`
 	Matricula          string `gorm:"size:50;index" json:"matricula"`
 	Ativo              bool   `gorm:"not null;default:true" json:"ativo"`
@@ -38,8 +38,14 @@ func NewFrentista(empresaID int64, nome, matricula string) (*Frentista, error) {
 	}, nil
 }
 
+// VincularUsuario vincula um usuário ao frentista. Um valor <= 0 desvincula.
 func (f *Frentista) VincularUsuario(usuarioID int64) {
-	f.UsuarioID = usuarioID
+	if usuarioID <= 0 {
+		f.UsuarioID = nil
+		return
+	}
+	id := usuarioID
+	f.UsuarioID = &id
 }
 
 func (f *Frentista) Desativar() {

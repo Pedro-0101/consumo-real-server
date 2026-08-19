@@ -131,6 +131,9 @@ func (r *Reservatorio) Atualizar(nome string, capacidade, nivelMinimo float64, c
 	if capacidade <= 0 {
 		return ErrCapacidadeInvalida
 	}
+	if r.NivelAtual > capacidade {
+		return ErrCapacidadeExcedida
+	}
 	if nivelMinimo < 0 || nivelMinimo > capacidade {
 		return ErrNivelMinimoInvalido
 	}

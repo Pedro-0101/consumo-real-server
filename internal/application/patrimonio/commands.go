@@ -13,7 +13,7 @@ import (
 type CreateCommand struct {
 	EmpresaID     int64
 	Nome          string
-	Tipo          string
+	Tipo          domainpatrimonio.Tipo
 	CodigoExterno string
 	TipoMedicao   domainpatrimonio.TipoMedicao
 	UsuarioID     int64
@@ -44,7 +44,7 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) (*domainp
 type UpdateCommand struct {
 	ID            int64
 	Nome          string
-	Tipo          string
+	Tipo          domainpatrimonio.Tipo
 	CodigoExterno string
 	TipoMedicao   domainpatrimonio.TipoMedicao
 	UsuarioID     int64

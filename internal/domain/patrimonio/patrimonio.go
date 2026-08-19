@@ -7,11 +7,13 @@ import (
 	"consumo-real-server/internal/shared"
 )
 
+type Tipo string
+
 const (
-	TipoVeiculo     = "VEICULO"
-	TipoFerramenta  = "FERRAMENTA"
-	TipoMaquina     = "MAQUINA"
-	TipoEquipamento = "EQUIPAMENTO"
+	TipoVeiculo     Tipo = "VEICULO"
+	TipoFerramenta  Tipo = "FERRAMENTA"
+	TipoMaquina     Tipo = "MAQUINA"
+	TipoEquipamento Tipo = "EQUIPAMENTO"
 )
 
 type TipoMedicao string
@@ -24,7 +26,7 @@ const (
 var (
 	ErrNomeObrigatorio     = errors.New("nome é obrigatório")
 	ErrEmpresaObrigatoria  = errors.New("empresa é obrigatória")
-	ErrTipoObrigatorio     = errors.New("tipo é obrigatório")
+	ErrTipoInvalido        = errors.New("tipo de patrimônio inválido")
 	ErrTipoMedicaoInvalido = errors.New("tipo de medição inválido")
 )
 
@@ -34,7 +36,7 @@ type Patrimonio struct {
 	UnidadeAdministrativaID int64             `gorm:"index" json:"unidadeAdministrativaID"`
 	Nome                    string            `gorm:"size:255;not null" json:"nome"`
 	Descricao               string            `gorm:"type:text" json:"descricao"`
-	Tipo                    string            `gorm:"type:varchar(30);not null;index" json:"tipo"`
+	Tipo                    Tipo              `gorm:"type:varchar(30);not null;index" json:"tipo"`
 	TipoMedicao             TipoMedicao       `gorm:"type:varchar(20);not null" json:"tipoMedicao"`
 	CodigoExterno           string            `gorm:"size:100;index" json:"codigoExterno"`
 	Atributos               map[string]string `gorm:"type:jsonb;serializer:json" json:"atributos"`
@@ -42,15 +44,15 @@ type Patrimonio struct {
 	shared.AuditFields      `gorm:"embedded;embeddedPrefix:"`
 }
 
-func NewPatrimonio(empresaID int64, nome, tipo, codigoExterno string, tipoMedicao TipoMedicao) (*Patrimonio, error) {
+func NewPatrimonio(empresaID int64, nome string, tipo Tipo, codigoExterno string, tipoMedicao TipoMedicao) (*Patrimonio, error) {
 	if empresaID <= 0 {
 		return nil, ErrEmpresaObrigatoria
 	}
 	if strings.TrimSpace(nome) == "" {
 		return nil, ErrNomeObrigatorio
 	}
-	if strings.TrimSpace(tipo) == "" {
-		return nil, ErrTipoObrigatorio
+	if !tipo.isValid() {
+		return nil, ErrTipoInvalido
 	}
 	if !tipoMedicao.isValid() {
 		return nil, ErrTipoMedicaoInvalido
@@ -59,7 +61,7 @@ func NewPatrimonio(empresaID int64, nome, tipo, codigoExterno string, tipoMedica
 	return &Patrimonio{
 		EmpresaID:     empresaID,
 		Nome:          strings.TrimSpace(nome),
-		Tipo:          strings.TrimSpace(tipo),
+		Tipo:          tipo,
 		TipoMedicao:   tipoMedicao,
 		CodigoExterno: strings.TrimSpace(codigoExterno),
 		Atributos:     make(map[string]string),
@@ -82,22 +84,30 @@ func (p *Patrimonio) Desativar() {
 	p.Ativo = false
 }
 
-func (p *Patrimonio) Atualizar(nome, tipo, codigoExterno string, tipoMedicao TipoMedicao) error {
+func (p *Patrimonio) Atualizar(nome string, tipo Tipo, codigoExterno string, tipoMedicao TipoMedicao) error {
 	if strings.TrimSpace(nome) == "" {
 		return ErrNomeObrigatorio
 	}
-	if strings.TrimSpace(tipo) == "" {
-		return ErrTipoObrigatorio
+	if !tipo.isValid() {
+		return ErrTipoInvalido
 	}
 	if !tipoMedicao.isValid() {
 		return ErrTipoMedicaoInvalido
 	}
 
 	p.Nome = strings.TrimSpace(nome)
-	p.Tipo = strings.TrimSpace(tipo)
+	p.Tipo = tipo
 	p.CodigoExterno = strings.TrimSpace(codigoExterno)
 	p.TipoMedicao = tipoMedicao
 	return nil
+}
+
+func (t Tipo) isValid() bool {
+	switch t {
+	case TipoVeiculo, TipoFerramenta, TipoMaquina, TipoEquipamento:
+		return true
+	}
+	return false
 }
 
 func (t TipoMedicao) isValid() bool {

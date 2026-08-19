@@ -21,13 +21,13 @@ var (
 
 type Entrada struct {
 	ID                 int64                   `gorm:"primaryKey" json:"id"`
-	EmpresaID          int64                   `gorm:"not null;index" json:"empresaID"`
+	EmpresaID          int64                   `gorm:"not null;uniqueIndex:uk_empresa_notafiscal,priority:1" json:"empresaID"`
 	FornecedorID       int64                   `gorm:"not null;index" json:"fornecedorID"`
 	ReservatorioID     int64                   `gorm:"not null;index" json:"reservatorioID"`
 	CombustivelID      int64                   `gorm:"not null;index" json:"combustivelID"`
 	Combustivel        combustivel.Combustivel `gorm:"foreignKey:CombustivelID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;" json:"combustivel"`
 	Quantidade         float64                 `gorm:"not null" json:"quantidade"`
-	NotaFiscal         string                  `gorm:"size:60;index" json:"notaFiscal"`
+	NotaFiscal         *string                 `gorm:"size:60;uniqueIndex:uk_empresa_notafiscal,priority:2" json:"notaFiscal"`
 	Data               time.Time               `gorm:"not null;index" json:"data"`
 	shared.AuditFields `gorm:"embedded;embeddedPrefix:"`
 }
@@ -59,7 +59,23 @@ func NewEntrada(empresaID, fornecedorID int64, reservatorio *reservatorio.Reserv
 		CombustivelID:  reservatorio.Combustivel.ID,
 		Combustivel:    reservatorio.Combustivel,
 		Quantidade:     quantidade,
-		NotaFiscal:     strings.TrimSpace(notaFiscal),
+		NotaFiscal:     normalizarNotaFiscal(notaFiscal),
 		Data:           timeutil.Now(),
 	}, nil
+}
+
+// AtualizarNotaFiscal atualiza a nota fiscal da entrada, normalizando o valor.
+// Um valor vazio desvincula a nota fiscal (NULL no banco).
+func (e *Entrada) AtualizarNotaFiscal(notaFiscal string) {
+	e.NotaFiscal = normalizarNotaFiscal(notaFiscal)
+}
+
+// normalizarNotaFiscal converte o valor para *string, retornando nil quando vazio.
+// Assim o índice único (empresa_id, nota_fiscal) aceita múltiplos NULLs.
+func normalizarNotaFiscal(notaFiscal string) *string {
+	nf := strings.TrimSpace(notaFiscal)
+	if nf == "" {
+		return nil
+	}
+	return &nf
 }

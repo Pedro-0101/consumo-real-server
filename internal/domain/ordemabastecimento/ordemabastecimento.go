@@ -21,6 +21,7 @@ const (
 var (
 	ErrEmpresaObrigatorio    = errors.New("empresa é obrigatória")
 	ErrPatrimonioObrigatorio = errors.New("patrimônio é obrigatório")
+	ErrNumeroObrigatorio     = errors.New("número é obrigatório")
 	ErrQuantidadeInvalida    = errors.New("quantidade deve ser maior que zero")
 	ErrStatusInvalido        = errors.New("operação não permitida para o status atual")
 	ErrOrdemVencida          = errors.New("ordem de abastecimento vencida")
@@ -29,8 +30,8 @@ var (
 
 type OrdemAbastecimento struct {
 	ID                   int64      `gorm:"primaryKey" json:"id"`
-	EmpresaID            int64      `gorm:"not null;index" json:"empresaID"`
-	Numero               string     `gorm:"size:50;not null;uniqueIndex" json:"numero"`
+	EmpresaID            int64      `gorm:"not null;uniqueIndex:uk_empresa_numero,priority:1" json:"empresaID"`
+	Numero               string     `gorm:"size:50;not null;uniqueIndex:uk_empresa_numero,priority:2" json:"numero"`
 	PatrimonioID         int64      `gorm:"not null;index" json:"patrimonioID"`
 	QuantidadeAutorizada float64    `gorm:"not null" json:"quantidadeAutorizada"`
 	QuantidadeAbastecida float64    `gorm:"not null;default:0" json:"quantidadeAbastecida"`
@@ -46,6 +47,9 @@ func NewOrdemAbastecimento(empresaID, patrimonioID int64, numero string, quantid
 	}
 	if patrimonioID <= 0 {
 		return nil, ErrPatrimonioObrigatorio
+	}
+	if strings.TrimSpace(numero) == "" {
+		return nil, ErrNumeroObrigatorio
 	}
 	if quantidadeAutorizada <= 0 {
 		return nil, ErrQuantidadeInvalida
